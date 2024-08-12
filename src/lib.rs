@@ -16,11 +16,6 @@ pub use array::Array;
 pub use file::File;
 
 #[cfg(any(target_arch = "wasm32", target_arch = "wasm64"))]
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-#[cfg(any(target_arch = "wasm32", target_arch = "wasm64"))]
 pub fn set_panic_hook() {
     // When the `console_error_panic_hook` feature is enabled, we can call the
     // `set_panic_hook` function at least once during initialization, and then
