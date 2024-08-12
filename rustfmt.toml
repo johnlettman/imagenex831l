@@ -1,0 +1,22 @@
+use_field_init_shorthand = true
+use_small_heuristics = "Max"
+
+# File Format
+newline_style = "Unix"
+
+# Normalization
+normalize_comments = true
+normalize_doc_attributes = true
+format_code_in_doc_comments = true
+wrap_comments = true
+match_block_trailing_comma = true
+trailing_comma = "Vertical"
+
+# Imports
+group_imports = "StdExternalCrate"
+imports_layout = "HorizontalVertical"
+imports_granularity = "Crate"
+reorder_imports = true
+
+
+
