@@ -9,7 +9,7 @@
         <sup><sub>
             An unofficial Rust library for interacting with data from
             <a href="https://imagenex.com/products/831l-pipe-profiling">            
-                IMAGENEX Model 831L Pipe Profiling Sonars
+                IMAGENEX 831L Pipe Profiling Sonars
             </a>.
         </sub></sup>
     </h1>
