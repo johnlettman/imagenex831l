@@ -118,6 +118,28 @@ mod tests {
     }
 
     #[test]
+    fn test_filter_delay() {
+        let cases = vec![
+            (RangeIndex::X12_5cm, 0.016),
+            (RangeIndex::X25cm, 0.016),
+            (RangeIndex::X50cm, 0.016),
+            (RangeIndex::X75cm, 0.016),
+            (RangeIndex::X1m, 0.020),
+            (RangeIndex::X2m, 0.024),
+            (RangeIndex::X3m, 0.030),
+            (RangeIndex::X4m, 0.030),
+            (RangeIndex::X5m, 0.030),
+            (RangeIndex::X6m, 0.030),
+        ];
+
+        for (range, want) in cases {
+            info!("Getting filter delay for {range:?}, want {want:?}");
+            let got = range.filter_delay();
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
     fn test_display() {
         let cases = vec![
             (RangeIndex::X12_5cm, "0.125 meters"),
