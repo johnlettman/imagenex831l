@@ -1,24 +1,18 @@
 <div align="center">
-    <br>
-    <img 
-        src=".github/assets/831L-transparent.png" 
-        alt="IMAGENEX Model 831L Pipe Profiling Sonar"
-    >
-    <h1>
-        imagenex831l<br>
-        <sup><sub>
-            An unofficial Rust library for interacting with data from
-            <a href="https://imagenex.com/products/831l-pipe-profiling">            
-                IMAGENEX 831L Pipe Profiling Sonars
-            </a>
-        </sub></sup>
-    </h1>
+<br>
+
+![IMAGENEX Model 831L Pipe Profiling Sonar][imagenex-831l-image]
+
+# imagenex831l
+An unofficial Rust library for interacting with data from
+[IMAGENEX 831L Pipe Profiling Sonars][imagenex-831l].
 
 [![License][shield-license]][url-license]
 ![Programming Language][shield-language]
 [![Tests][shield-tests]][url-tests]
 [![Coverage][shield-codecov]][url-codecov]
 
+<hr>
 </div>
 
 ## Features
@@ -132,6 +126,9 @@ Shot {
 ```
 
 </details>
+
+[imagenex-831l-image]: .github/assets/831L-transparent.png
+[imagenex-831l]: https://imagenex.com/products/831l-pipe-profiling
 
 [shield-license]: https://img.shields.io/github/license/johnlettman/imagenex831l?style=for-the-badge
 [url-license]: ./LICENSE
