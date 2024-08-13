@@ -169,7 +169,7 @@ mod tests {
         ),
         (
             SensorInformation { pitch_valid: true, roll_valid: true, distance_valid: false },
-            [0b0000_0110],
+            [0b0000_0011],
         ),
         (
             SensorInformation { pitch_valid: true, roll_valid: false, distance_valid: true },
@@ -177,11 +177,11 @@ mod tests {
         ),
         (
             SensorInformation { pitch_valid: false, roll_valid: true, distance_valid: true },
-            [0b0000_0111],
+            [0b0000_0110],
         ),
         (
             SensorInformation { pitch_valid: false, roll_valid: false, distance_valid: false },
-            [0b0000_0111],
+            [0b0000_0000],
         ),
     ];
 
