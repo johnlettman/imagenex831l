@@ -38,5 +38,5 @@ where
     T: ToPrimitive,
 {
     let raw = write_u8(value, pos)?;
-    Ok((raw & mask) << shift)
+    Ok((raw << shift) & mask)
 }
