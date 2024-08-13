@@ -112,3 +112,108 @@ impl BinWrite for SensorInformation {
         self.write(writer)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    use crate::types::sensor_information;
+    use log::info;
+    use test_log::test;
+
+    #[test]
+    fn test_fmt_valid() {
+        let cases = vec![(true, "valid"), (false, "invalid")];
+
+        for (validity, want) in cases {
+            info!("Formatting {validity:?}, want {want:?}");
+            let got = SensorInformation::fmt_valid(validity);
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_display() {
+        let cases = vec![
+            (
+                SensorInformation { pitch_valid: true, roll_valid: true, distance_valid: true },
+                "(pitch: valid, roll: valid, distance: valid)",
+            ),
+            (
+                SensorInformation { pitch_valid: true, roll_valid: false, distance_valid: true },
+                "(pitch: valid, roll: invalid, distance: valid)",
+            ),
+            (
+                SensorInformation { pitch_valid: true, roll_valid: true, distance_valid: false },
+                "(pitch: valid, roll: valid, distance: invalid)",
+            ),
+            (
+                SensorInformation { pitch_valid: false, roll_valid: true, distance_valid: true },
+                "(pitch: invalid, roll: valid, distance: valid)",
+            ),
+        ];
+
+        for (sensor_information, want) in cases {
+            info!("Displaying {sensor_information:?}, want {want:?}");
+            let got = format!("{sensor_information}");
+            assert_eq!(want, got);
+        }
+    }
+
+    const BINARY_ENDIAN: Endian = Endian::NATIVE;
+    const BINARY_CASES: [(SensorInformation, [u8; 1]); 5] = [
+        (SensorInformation::new(true, true, true), [0b0000_0111]),
+        (SensorInformation::new(true, true, false), [0b0000_0110]),
+        (SensorInformation::new(true, false, true), [0b0000_0101]),
+        (SensorInformation::new(false, true, true), [0b0000_0111]),
+        (SensorInformation::new(false, false, false), [0b0000_0111]),
+    ];
+
+    #[test]
+    fn test_parse() {
+        for (want, bytes) in BINARY_CASES {
+            info!("Parsing {bytes:?}, want {want:?}");
+            let mut cursor = Cursor::new(bytes);
+            let got = SensorInformation::read(&mut cursor).expect("It should not return an error");
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_parse_options() {
+        for (want, bytes) in BINARY_CASES {
+            info!("Parsing {bytes:?}, want {want:?}");
+            let mut cursor = Cursor::new(bytes);
+            let got = SensorInformation::read_options(&mut cursor, BINARY_ENDIAN, ())
+                .expect("It should not return an error");
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_write() {
+        for (sensor_information, want) in BINARY_CASES {
+            info!("Writing {sensor_information:?}, want {want:?}");
+            let mut cursor = Cursor::new(Vec::new());
+            sensor_information.write(&mut cursor).expect("It should not return an error");
+            let inner = cursor.into_inner();
+            let got = inner.as_slice();
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_write_options() {
+        for (sensor_information, want) in BINARY_CASES {
+            info!("Writing {sensor_information:?}, want {want:?}");
+            let mut cursor = Cursor::new(Vec::new());
+            sensor_information
+                .write_options(&mut cursor, BINARY_ENDIAN, ())
+                .expect("It should not return an error");
+            let inner = cursor.into_inner();
+            let got = inner.as_slice();
+            assert_eq!(want, got);
+        }
+    }
+}
