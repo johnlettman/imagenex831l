@@ -62,9 +62,9 @@ impl BinRead for SensorInformation {
     {
         let raw = u8::read(reader)?;
         Ok(Self {
-            pitch_valid: (raw & FLAG_PITCH_VALID) == 0,
-            roll_valid: (raw & FLAG_ROLL_VALID) == 0,
-            distance_valid: (raw & FLAG_DISTANCE_VALID) == 0,
+            pitch_valid: (raw & FLAG_PITCH_VALID) != 0,
+            roll_valid: (raw & FLAG_ROLL_VALID) != 0,
+            distance_valid: (raw & FLAG_DISTANCE_VALID) != 0,
         })
     }
 
