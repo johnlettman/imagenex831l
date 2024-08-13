@@ -163,11 +163,26 @@ mod tests {
 
     const BINARY_ENDIAN: Endian = Endian::NATIVE;
     const BINARY_CASES: [(SensorInformation, [u8; 1]); 5] = [
-        (SensorInformation::new(true, true, true), [0b0000_0111]),
-        (SensorInformation::new(true, true, false), [0b0000_0110]),
-        (SensorInformation::new(true, false, true), [0b0000_0101]),
-        (SensorInformation::new(false, true, true), [0b0000_0111]),
-        (SensorInformation::new(false, false, false), [0b0000_0111]),
+        (
+            SensorInformation { pitch_valid: true, roll_valid: true, distance_valid: true },
+            [0b0000_0111],
+        ),
+        (
+            SensorInformation { pitch_valid: true, roll_valid: true, distance_valid: false },
+            [0b0000_0110],
+        ),
+        (
+            SensorInformation { pitch_valid: true, roll_valid: false, distance_valid: true },
+            [0b0000_0101],
+        ),
+        (
+            SensorInformation { pitch_valid: false, roll_valid: true, distance_valid: true },
+            [0b0000_0111],
+        ),
+        (
+            SensorInformation { pitch_valid: false, roll_valid: false, distance_valid: false },
+            [0b0000_0111],
+        ),
     ];
 
     #[test]
