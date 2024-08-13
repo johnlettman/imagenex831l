@@ -99,3 +99,90 @@ impl BinWrite for MotionConfig {
         self.write(writer)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    use log::info;
+    use test_log::test;
+
+    const BINARY_ENDIAN: Endian = Endian::NATIVE;
+    const BINARY_CASES: [(MotionConfig, [u8; 1]); 3] = [
+        (
+            MotionConfig {
+                direction: Direction::Counterclockwise,
+                transducer: Transducer::Down,
+                mode: Mode::Sector,
+                step_size: StepSize::Slow,
+            },
+            [0b0000_0000],
+        ),
+        (
+            MotionConfig {
+                direction: Direction::Clockwise,
+                transducer: Transducer::Up,
+                mode: Mode::Polar,
+                step_size: StepSize::Medium,
+            },
+            [0b1100_1001],
+        ),
+        (
+            MotionConfig {
+                direction: Direction::Clockwise,
+                transducer: Transducer::Up,
+                mode: Mode::Polar,
+                step_size: StepSize::Fast,
+            },
+            [0b1100_1010],
+        ),
+    ];
+
+    #[test]
+    fn test_parse() {
+        for (want, bytes) in BINARY_CASES {
+            info!("Parsing {bytes:?}, want {want:?}");
+            let mut cursor = Cursor::new(bytes);
+            let got = MotionConfig::read(&mut cursor).expect("It should not return an error");
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_parse_options() {
+        for (want, bytes) in BINARY_CASES {
+            info!("Parsing {bytes:?}, want {want:?}");
+            let mut cursor = Cursor::new(bytes);
+            let got = MotionConfig::read_options(&mut cursor, BINARY_ENDIAN, ())
+                .expect("It should not return an error");
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_write() {
+        for (motion_config, want) in BINARY_CASES {
+            info!("Writing {motion_config:?}, want {want:?}");
+            let mut cursor = Cursor::new(Vec::new());
+            motion_config.write(&mut cursor).expect("It should not return an error");
+            let inner = cursor.into_inner();
+            let got = inner.as_slice();
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_write_options() {
+        for (motion_config, want) in BINARY_CASES {
+            info!("Writing {motion_config:?}, want {want:?}");
+            let mut cursor = Cursor::new(Vec::new());
+            motion_config
+                .write_options(&mut cursor, BINARY_ENDIAN, ())
+                .expect("It should not return an error");
+            let inner = cursor.into_inner();
+            let got = inner.as_slice();
+            assert_eq!(want, got);
+        }
+    }
+}
