@@ -1,38 +1,149 @@
 name: Continuous Integration
 
 on:
+  pull_request:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
 
 env:
+  CLICOLOR: 1
   CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
 
 jobs:
-  test:
-    name: Test
+  ci:
+    name: CI
+    needs: [fmt, check, docs, lock, test, coverage]
+    runs-on: ubuntu-latest
+    if: "always()"
+    steps:
+      - name: Failed
+        run: exit 1
+        if: "contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')"
+
+  fmt:
+    name: Check formatting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+  check:
+    name: Cargo check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Check
+        run: cargo check
+
+  docs:
+    name: Check documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run documentation
+        run: cargo doc --workspace --all-features --no-deps --document-private-items
+
+  lock:
+    name: Check Cargo.lock
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - name: "Is Cargo.lock up to date?"
+        run: cargo update --locked
+
+  test:
+    name: Test on ${{ matrix.os }} with Rust ${{ matrix.toolchain }}
+    strategy:
+      matrix:
+        build: [nightly, linux, windows, mac]
+        include:
+          - build: nightly
+            os: ubuntu-latest
+            toolchain: nightly
+          - build: linux
+            os: ubuntu-latest
+            toolchain: stable
+          - build: windows
+            os: windows-latest
+            toolchain: stable
+          - build: mac
+            os: macos-latest
+            toolchain: stable
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.rust != 'stable' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build
+      - name: Test
+        run: cargo test
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
-          override: true
-      - name: Build
-        run: cargo build --verbose
-      - name: Test
-        run: cargo test --verbose
-        env:
-          CARGO_INCREMENTAL: '0'
-          RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
-          RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
-      - name: rust-grcov
-        uses: actions-rs/grcov@v0.1
-      - name: Codecov
-        uses: codecov/codecov-action@v4
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+      - name: Install llvm-cov
+        uses: taiki-e/install-action@v2
         with:
+          tool: cargo-llvm-cov
+      - name: Generate coverage
+        run: cargo llvm-cov --doctests
+      - name: Determine if CODECOV_TOKEN is available
+        id: has_codecov
+        run: echo 'result=${{ secrets.CODECOV_TOKEN }}' >> $GITHUB_OUTPUT
+      - name: Generate coverage file
+        run: cargo llvm-cov --doctests --no-run --lcov --output-path lcov.info
+        if: steps.has_codecov.outputs.result != 0
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v4
+        with:
+          files: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
-          fail_ci_if_error: true
+          fail_ci_if_error: false
+        if: steps.has_codecov.outputs.result != 0
