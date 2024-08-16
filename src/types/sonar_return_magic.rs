@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use binrw::meta::{EndianKind, ReadEndian, WriteEndian};
 use binrw::{BinRead, BinResult, BinWrite, Endian, Error};
 use std::io::{Error as IOError, ErrorKind::InvalidData, Read, Seek, Write};
@@ -6,8 +7,7 @@ use std::io::{Error as IOError, ErrorKind::InvalidData, Read, Seek, Write};
 #[cfg_attr(
     target_family = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
-    tsify(into_wasm_abi, from_wasm_abi),
-    serde(rename_all = "UPPERCASE")
+    tsify(into_wasm_abi, from_wasm_abi)
 )]
 pub enum SonarReturnMagic {
     IMX,
@@ -20,6 +20,15 @@ impl SonarReturnMagic {
             Self::IMX => 250,
             Self::IPX => 0,
         }
+    }
+}
+
+impl Display for SonarReturnMagic {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match *self {
+            Self::IMX => "IMX",
+            Self::IPX => "IPX"
+        })
     }
 }
 
@@ -53,6 +62,7 @@ impl BinRead for SonarReturnMagic {
         }
     }
 
+    #[inline]
     fn read_options<R: Read + Seek>(
         reader: &mut R,
         _: Endian,
@@ -78,6 +88,7 @@ impl BinWrite for SonarReturnMagic {
         Ok(())
     }
 
+    #[inline]
     fn write_options<W: Write + Seek>(
         &self,
         writer: &mut W,
@@ -85,5 +96,70 @@ impl BinWrite for SonarReturnMagic {
         _: Self::Args<'_>,
     ) -> BinResult<()> {
         self.write(writer)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::io::Cursor;
+    use super::*;
+
+    use test_log::test;
+    use log::info;
+
+    #[test]
+    fn test_data_length() {
+        let cases = vec![
+            (SonarReturnMagic::IMX, 250),
+            (SonarReturnMagic::IPX, 0)
+        ];
+
+        for (magic, want) in cases {
+            info!("Getting data length for {magic:?}, want {want:?}");
+            let got = magic.data_length();
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_display() {
+        let cases = vec![
+            (SonarReturnMagic::IMX, "IMX"),
+            (SonarReturnMagic::IPX, "IPX")
+        ];
+
+        for (magic, want) in cases {
+            info!("Displaying {magic:?}, want {want:?}");
+            let got = format!("{magic}");
+            assert_eq!(want, got);
+        }
+    }
+
+    const BINARY_ENDIAN: Endian = Endian::NATIVE;
+    const BINARY_CASES: [(SonarReturnMagic, &[u8;3]); 2] = [
+        (SonarReturnMagic::IMX, b"IMX"),
+        (SonarReturnMagic::IPX, b"IPX")
+    ];
+
+    #[test]
+    fn test_parse() {
+        for (want, bytes) in BINARY_CASES {
+            info!("Parsing {bytes:?}, want {want:?}");
+            let mut cursor = Cursor::new(bytes);
+            let got = SonarReturnMagic::read_options(&mut cursor, BINARY_ENDIAN, ()).expect("It should not return an error");
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_write() {
+        for (magic, want) in BINARY_CASES {
+            info!("Writing {magic:?}, want {want:?}");
+            let mut cursor = Cursor::new(Vec::new());
+            magic.write_options(&mut cursor, BINARY_ENDIAN, ()).expect("It should not return an error");
+            let inner = cursor.into_inner();
+            let got = inner.as_slice();
+            assert_eq!(want, got);
+        }
     }
 }
