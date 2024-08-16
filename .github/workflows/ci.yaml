@@ -17,13 +17,24 @@ env:
 jobs:
   ci:
     name: CI
-    needs: [fmt, check, docs, lock, test, coverage]
+    needs: [shellcheck, fmt, check, docs, lock, test, coverage]
     runs-on: ubuntu-latest
     if: "always()"
     steps:
       - name: Failed
         run: exit 1
         if: "contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')"
+
+  shellcheck:
+    name: Check shell scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt install -y shellcheck
+      - name: Run shellcheck
+        run: shellcheck ./scripts/*
 
   fmt:
     name: Check formatting
