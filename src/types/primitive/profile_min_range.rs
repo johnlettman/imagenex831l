@@ -89,7 +89,8 @@ mod tests {
         for (profile_min_range, want) in BINARY_CASES.iter() {
             info!("Writing {profile_min_range:?}, want {want:?}");
             let mut cursor = Cursor::new(Vec::new());
-            write(&profile_min_range, &mut cursor, BINARY_ENDIAN, ()).expect("It should not return an error");
+            write(&profile_min_range, &mut cursor, BINARY_ENDIAN, ())
+                .expect("It should not return an error");
             let inner = cursor.into_inner();
             let got = inner.as_slice();
             assert_eq!(want, got);
