@@ -120,3 +120,119 @@ impl BinWrite for SonarReturnStatus {
         self.write(writer)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use binrw::{io::Cursor, BinRead, BinWrite};
+
+    use log::info;
+    use test_log::test;
+
+    #[test]
+    fn test_default() {
+        let want = SonarReturnStatus {
+            range_error: false,
+            frequency_error: false,
+            internal_sensor_error: false,
+            calibration_error: false,
+            switches_accepted: false,
+        };
+
+        let got = SonarReturnStatus::default();
+        assert_eq!(want, got);
+    }
+
+    #[test]
+    fn test_has_error() {
+        let mut status = SonarReturnStatus::default();
+        assert!(!status.has_error());
+
+        status.range_error = true;
+        assert!(status.has_error());
+
+        status.range_error = false;
+        status.frequency_error = true;
+        assert!(status.has_error());
+
+        status.internal_sensor_error = true;
+        assert!(status.has_error());
+
+        status.calibration_error = true;
+        assert!(status.has_error());
+    }
+
+    const BINARY_CASES: [(SonarReturnStatus, u8); 5] = [
+        (
+            SonarReturnStatus {
+                range_error: false,
+                frequency_error: false,
+                internal_sensor_error: false,
+                calibration_error: false,
+                switches_accepted: false,
+            },
+            0b0000_0000,
+        ),
+        (
+            SonarReturnStatus {
+                range_error: true,
+                frequency_error: false,
+                internal_sensor_error: false,
+                calibration_error: false,
+                switches_accepted: true,
+            },
+            0b1000_0001,
+        ),
+        (
+            SonarReturnStatus {
+                range_error: true,
+                frequency_error: true,
+                internal_sensor_error: true,
+                calibration_error: true,
+                switches_accepted: true,
+            },
+            0b1111_0001,
+        ),
+        (
+            SonarReturnStatus {
+                range_error: false,
+                frequency_error: true,
+                internal_sensor_error: false,
+                calibration_error: true,
+                switches_accepted: false,
+            },
+            0b0101_0000,
+        ),
+        (
+            SonarReturnStatus {
+                range_error: true,
+                frequency_error: true,
+                internal_sensor_error: false,
+                calibration_error: false,
+                switches_accepted: false,
+            },
+            0b1100_0000,
+        ),
+    ];
+
+    #[test]
+    fn test_parse() {
+        for &(ref want, raw) in BINARY_CASES.iter() {
+            info!("Parsing {raw:?}, expecting {want:?}");
+            let mut cursor = Cursor::new(vec![raw]);
+            let got = SonarReturnStatus::read(&mut cursor).expect("It should not return an error");
+            assert_eq!(want, &got);
+        }
+    }
+
+    #[test]
+    fn test_write() {
+        for &(ref status, raw) in BINARY_CASES.iter() {
+            info!("Writing {status:?}, expecting {raw:?}");
+            let mut cursor = Cursor::new(Vec::new());
+            status.write(&mut cursor).expect("It should not return an error");
+            let written_data = cursor.into_inner();
+            assert_eq!(written_data, vec![raw]);
+        }
+    }
+}
