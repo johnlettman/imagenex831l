@@ -2,7 +2,6 @@ use crate::types::{
     util::primitive::{read_u8_bits, write_u8_bits},
     DataBits, Logf, ProfileGrid, Zero,
 };
-use binrw::__private::Required;
 use binrw::meta::{EndianKind, ReadEndian, WriteEndian};
 use binrw::{BinRead, BinResult, BinWrite, Endian};
 use std::io::{Read, Seek, Write};
@@ -45,7 +44,6 @@ impl BinRead for Config {
     fn read<R: Read + Seek>(reader: &mut R) -> BinResult<Self>
     where
         Self: ReadEndian,
-        for<'a> Self::Args<'a>: Required,
     {
         let raw = u8::read(reader)?;
         let pos = reader.stream_position()?;
@@ -80,7 +78,6 @@ impl BinWrite for Config {
     fn write<W: Write + Seek>(&self, writer: &mut W) -> BinResult<()>
     where
         Self: WriteEndian,
-        for<'a> Self::Args<'a>: Required,
     {
         let mut raw: u8 = 0;
         let pos = writer.stream_position()?;

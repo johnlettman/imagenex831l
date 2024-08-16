@@ -1,4 +1,3 @@
-use binrw::__private::Required;
 use binrw::meta::{EndianKind, ReadEndian, WriteEndian};
 use binrw::{BinRead, BinResult, BinWrite, Endian, Error};
 use std::io::{Error as IOError, ErrorKind::InvalidData, Read, Seek, Write};
@@ -38,7 +37,6 @@ impl BinRead for SonarReturnMagic {
     fn read<R: Read + Seek>(reader: &mut R) -> BinResult<Self>
     where
         Self: ReadEndian,
-        for<'a> Self::Args<'a>: Required,
     {
         let mut raw = [0u8; 3];
         let pos = reader.stream_position()?;
@@ -70,7 +68,6 @@ impl BinWrite for SonarReturnMagic {
     fn write<W: Write + Seek>(&self, writer: &mut W) -> BinResult<()>
     where
         Self: WriteEndian,
-        for<'a> Self::Args<'a>: Required,
     {
         let raw = match *self {
             Self::IMX => b"IMX",

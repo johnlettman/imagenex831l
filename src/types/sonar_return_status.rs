@@ -1,4 +1,3 @@
-use binrw::__private::Required;
 use binrw::meta::{EndianKind, ReadEndian, WriteEndian};
 use binrw::{BinRead, BinResult, BinWrite, Endian};
 use std::io::{Read, Seek, Write};
@@ -53,7 +52,6 @@ impl BinRead for SonarReturnStatus {
     fn read<R: Read + Seek>(reader: &mut R) -> BinResult<Self>
     where
         Self: ReadEndian,
-        for<'a> Self::Args<'a>: Required,
     {
         let raw = u8::read(reader)?;
 
@@ -87,7 +85,6 @@ impl BinWrite for SonarReturnStatus {
     fn write<W: Write + Seek>(&self, writer: &mut W) -> BinResult<()>
     where
         Self: WriteEndian,
-        for<'a> Self::Args<'a>: Required,
     {
         let mut raw: u8 = 0;
 

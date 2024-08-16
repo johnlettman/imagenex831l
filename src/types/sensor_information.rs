@@ -1,4 +1,3 @@
-use binrw::__private::Required;
 use binrw::meta::{EndianKind, ReadEndian, WriteEndian};
 use binrw::{BinRead, BinResult, BinWrite, Endian};
 use std::fmt::{Display, Formatter};
@@ -58,7 +57,6 @@ impl BinRead for SensorInformation {
     fn read<R: Read + Seek>(reader: &mut R) -> BinResult<Self>
     where
         Self: ReadEndian,
-        for<'a> Self::Args<'a>: Required,
     {
         let raw = u8::read(reader)?;
         Ok(Self {
@@ -83,7 +81,6 @@ impl BinWrite for SensorInformation {
     fn write<W: Write + Seek>(&self, writer: &mut W) -> BinResult<()>
     where
         Self: WriteEndian,
-        for<'a> Self::Args<'a>: Required,
     {
         let mut raw: u8 = 0;
 
