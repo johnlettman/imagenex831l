@@ -62,6 +62,7 @@ mod tests {
     use log::info;
     use test_log::test;
 
+    #[test]
     fn test_eq() {
         let cases = vec![
             (Acceleration::new(6.0, true, false), Acceleration::new(6.0, true, false), true),
@@ -76,6 +77,7 @@ mod tests {
         }
     }
 
+    #[test]
     fn test_ord() {
         let cases = vec![
             (
