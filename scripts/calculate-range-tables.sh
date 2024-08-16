@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function calculate_bins_for() {
+function calculate_tables_for() {
 	if [ -z "$1" ]; then
 		read -pr "Please provide a floating-point range from a RangeIndex (f32): " range
 	else
@@ -27,19 +27,19 @@ function calculate_bins_for() {
 	echo "${result}"
 }
 
-function calculate_bins() {
+function calculate_tables() {
 	if [ "$1" == "all" ]; then
 		for range in "0.125" "0.25" "0.5" "0.75" "1" "2" "3" "4" "5" "6"; do
 			echo "// Range: ${range}m"
-			calculate_bins_for "${range}"
+			calculate_tables_for "${range}"
 			echo
 		done
 		return
 	fi
 
-	calculate_bins_for "$1"
+	calculate_tables_for "$1"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-	calculate_bins "$@"
+	calculate_tables "$@"
 fi
