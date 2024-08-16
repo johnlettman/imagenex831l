@@ -2,8 +2,8 @@ use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 use std::io::{Error as IOError, ErrorKind::InvalidData};
 
-const MAX: i16 = 8191;
-const MIN: i16 = -8192;
+pub const MAX: i16 = 8191;
+pub const MIN: i16 = -8192;
 
 const FLAG_1: u8 = 0b1000_0000;
 const FLAG_2: u8 = 0b0100_0000;
