@@ -36,9 +36,31 @@ impl Display for MotorCalibrate {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use num_traits::{FromPrimitive, ToPrimitive};
 
     use log::info;
     use test_log::test;
+
+    const PRIMITIVE_CASES: [(MotorCalibrate, u8); 2] =
+        [(MotorCalibrate::Normal, 0), (MotorCalibrate::Calibrate, 1)];
+
+    #[test]
+    fn test_from_primitive() {
+        for (want, primitive) in PRIMITIVE_CASES {
+            info!("From primitive {primitive:?}, want {want:?}");
+            let got = MotorCalibrate::from_u8(primitive).expect("It should return a value");
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_to_primitive() {
+        for (motor_calibrate, want) in PRIMITIVE_CASES {
+            info!("{motor_calibrate:?} to primitive, want {want:?}");
+            let got = motor_calibrate.to_u8().expect("It should return a value");
+            assert_eq!(want, got);
+        }
+    }
 
     #[test]
     fn test_default() {
