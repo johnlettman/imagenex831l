@@ -149,6 +149,18 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_invalid() {
+        let cases = vec![b"ASD", b"QWE", b"TFD"];
+
+        for bytes in cases {
+            info!("Parsing {bytes:?}, want error");
+            let mut cursor = Cursor::new(bytes);
+            let error = SonarReturnMagic::read_options(&mut cursor, BINARY_ENDIAN, ()).unwrap_err();
+            assert!(matches!(error, Error::Custom { .. }));
+        }
+    }
+
+    #[test]
     fn test_write() {
         for (magic, want) in BINARY_CASES {
             info!("Writing {magic:?}, want {want:?}");
