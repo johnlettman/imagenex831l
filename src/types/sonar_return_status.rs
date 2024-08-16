@@ -162,6 +162,7 @@ mod tests {
         assert!(status.has_error());
     }
 
+    const BINARY_ENDIAN: Endian = Endian::Big;
     const BINARY_CASES: [(SonarReturnStatus, u8); 5] = [
         (
             SonarReturnStatus {
@@ -220,7 +221,8 @@ mod tests {
         for &(ref want, raw) in BINARY_CASES.iter() {
             info!("Parsing {raw:?}, expecting {want:?}");
             let mut cursor = Cursor::new(vec![raw]);
-            let got = SonarReturnStatus::read(&mut cursor).expect("It should not return an error");
+            let got = SonarReturnStatus::read_options(&mut cursor, BINARY_ENDIAN, ())
+                .expect("It should not return an error");
             assert_eq!(want, &got);
         }
     }
@@ -230,7 +232,9 @@ mod tests {
         for &(ref status, raw) in BINARY_CASES.iter() {
             info!("Writing {status:?}, expecting {raw:?}");
             let mut cursor = Cursor::new(Vec::new());
-            status.write(&mut cursor).expect("It should not return an error");
+            status
+                .write_options(&mut cursor, BINARY_ENDIAN, ())
+                .expect("It should not return an error");
             let written_data = cursor.into_inner();
             assert_eq!(written_data, vec![raw]);
         }
