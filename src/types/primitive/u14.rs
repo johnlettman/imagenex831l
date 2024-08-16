@@ -2,17 +2,21 @@ use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 use std::io::{Error as IOError, ErrorKind::InvalidData};
 
-pub const MIN: u16 = 0;
 pub const MAX: u16 = 0b0011_1111_1111_1111;
 
 const MASK_HIGH: u8 = 0b0111_1110;
+const SHIFT_HIGH: usize = 1;
+
+const MASK_HIGH_L: u8 = 0b0000_0001;
+const SHIFT_HIGH_L: usize = 7;
+
 const MASK_LOW: u8 = 0b0111_1111;
 
-const ERR_MESSAGE_RANGE: &'static str = concatcp!("u14 exceeds range from ", MIN, " to ", MAX);
+const ERR_MESSAGE_RANGE: &'static str = concatcp!("u14 exceeds maximum of ", MAX);
 
 #[inline]
 pub fn valid(u14: u16) -> bool {
-    MIN <= u14 && u14 <= MAX
+    u14 <= MAX
 }
 
 #[parser(reader, endian)]
@@ -23,8 +27,8 @@ pub fn parse() -> BinResult<u16> {
     let high = (raw & 0xFF) as u8;
     let low = (raw >> 8) as u8;
 
-    let high_part = (high & MASK_HIGH) >> 1;
-    let low_part = (low & MASK_LOW) | ((high & 0b1) << 7);
+    let high_part = (high & MASK_HIGH) >> SHIFT_HIGH;
+    let low_part = (low & MASK_LOW) | ((high & MASK_HIGH_L) << SHIFT_HIGH_L);
 
     let value = ((high_part as u16) << 8) | (low_part as u16);
     Ok(value)
@@ -43,10 +47,74 @@ pub fn write(u14: &u16) -> BinResult<()> {
     let high = (*u14 >> 8) as u8;
     let low = (*u14 & 0xFF) as u8;
 
-    let high_part = ((high & 0b11_1111) << 1) | (low & 0b1);
-    let low_part = low >> 1;
+    let high_part = ((high << SHIFT_HIGH) & MASK_HIGH) | ((low >> SHIFT_HIGH_L) & MASK_HIGH_L);
+    let low_part = low & MASK_LOW;
 
     let raw = ((low_part as u16) << 8) | (high_part as u16);
-    raw.write_options(writer, endian, ())?;
-    Ok(())
+    raw.write_options(writer, endian, ())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use binrw::{io::Cursor, BinRead, BinWrite, Endian};
+
+    use log::info;
+    use test_log::test;
+
+    #[test]
+    fn test_valid() {
+        let cases = vec![(0, true), (8191, true), (16383, true), (16384, false), (65535, false)];
+
+        for (u14_value, want) in cases {
+            info!("Testing validity of {u14_value:?}, want {want:?}");
+            let got = valid(u14_value);
+            assert_eq!(want, got);
+        }
+    }
+
+    const BINARY_ENDIAN: Endian = Endian::Big;
+    const BINARY_CASES: [(u16, [u8; 2]); 3] = [
+        (0x0000, [0x00, 0x00]),
+        (0b0011_1111_1111_1111, [0b0111_1111, 0b0111_1111]),
+        (0b0010_1010_1010_1010, [0b0010_1010, 0b0101_0101]),
+    ];
+
+    #[test]
+    fn test_parse() {
+        for &(want, bytes) in BINARY_CASES.iter() {
+            info!("Parsing {bytes:?}, want {want:?}");
+            let mut cursor = Cursor::new(bytes);
+            let got = parse(&mut cursor, BINARY_ENDIAN, ()).expect("It should not return an error");
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_write() {
+        for (u14_value, want) in BINARY_CASES.iter() {
+            info!("Writing {u14_value:?}, want {want:?}");
+            let mut cursor = Cursor::new(Vec::new());
+            write(&u14_value, &mut cursor, BINARY_ENDIAN, ())
+                .expect("It should not return an error");
+            let inner = cursor.into_inner();
+            let got = inner.as_slice();
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn test_write_invalid() {
+        let cases = [
+            16384, // Invalid: just over the maximum for u14
+            32768, // Invalid: exceeds the u14 range
+        ];
+
+        for u14_value in cases.iter() {
+            info!("Writing {u14_value:?}, want error");
+            let mut cursor = Cursor::new(Vec::new());
+            let error = write(u14_value, &mut cursor, BINARY_ENDIAN, ()).unwrap_err();
+            assert!(matches!(error, Error::Custom { .. }));
+        }
+    }
 }
