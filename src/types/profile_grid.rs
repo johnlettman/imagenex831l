@@ -41,8 +41,9 @@ mod tests {
 
     #[test]
     fn test_default() {
+        let want = ProfileGrid::Off;
         let got = ProfileGrid::default();
-        assert_eq!(ProfileGrid::Off, got);
+        assert_eq!(want, got);
     }
 
     #[test]
@@ -50,7 +51,7 @@ mod tests {
         let cases = vec![(ProfileGrid::Off, "off"), (ProfileGrid::On, "on")];
 
         for (profile_grid, want) in cases {
-            info!("Displaying {profile_grid:?}, expecting {want}");
+            info!("Displaying {profile_grid:?}, want {want}");
             let got = format!("{profile_grid}");
             assert_eq!(want, got);
         }
