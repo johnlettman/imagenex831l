@@ -38,14 +38,19 @@ pub fn write(pulse_length: &u16) -> BinResult<()> {
 mod tests {
     use super::*;
     use binrw::{io::Cursor, Endian};
+
     use log::info;
+    use test_log::test;
 
     #[test]
     fn test_valid() {
-        assert!(valid(0));
-        assert!(valid(500));
-        assert!(valid(1_000));
-        assert!(!valid(1_001));
+        let cases = vec![(0, true), (500, true), (1_000, true), (1_001, false)];
+
+        for (pulse_length, want) in cases {
+            info!("Testing validity of {pulse_length:?}, want {want:?}");
+            let got = valid(pulse_length);
+            assert_eq!(want, got);
+        }
     }
 
     const BINARY_ENDIAN: Endian = Endian::Big;
