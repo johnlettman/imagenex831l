@@ -55,7 +55,7 @@ pub enum RangeIndex {
 }
 
 impl RangeIndex {
-    pub fn range(&self) -> f32 {
+    pub const fn range(&self) -> f32 {
         match *self {
             Self::X0_125m => 0.125,
             Self::X0_25m => 0.250,
@@ -70,7 +70,7 @@ impl RangeIndex {
         }
     }
 
-    pub fn filter_delay(&self) -> f32 {
+    pub const fn filter_delay(&self) -> f32 {
         match *self {
             Self::X0_125m | Self::X0_25m | Self::X0_50m | Self::X0_75m => 0.016,
             Self::X1m => 0.020,
