@@ -1,17 +1,17 @@
-use crate::types::{primitive::u14, RangeIndex};
+use crate::types::{primitive::u14, RangeCode};
 use binrw::{parser, writer, BinResult, BinWrite};
 
 const SCALE: f32 = 0.0005;
 
 #[parser(reader, endian)]
-pub fn parse(range_index: RangeIndex) -> BinResult<f32> {
+pub fn parse(range_index: RangeCode) -> BinResult<f32> {
     let value = u14::parse(reader, endian, ())?;
     let profile_range = (value as f32 * SCALE).floor() + range_index.filter_delay();
     Ok(profile_range)
 }
 
 #[writer(writer, endian)]
-pub fn write(profile_range: &f32, range_index: &RangeIndex) -> BinResult<()> {
+pub fn write(profile_range: &f32, range_index: &RangeCode) -> BinResult<()> {
     let value = ((*profile_range - range_index.filter_delay()) / SCALE).floor() as u16;
     u14::write(&value, writer, endian, ())?;
     Ok(())

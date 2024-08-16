@@ -1,4 +1,4 @@
-use crate::types::{Command, RangeIndex};
+use crate::types::{Command, RangeCode};
 use binrw::{BinRead, BinWrite};
 
 #[derive(Debug, BinRead, BinWrite)]
@@ -6,7 +6,7 @@ use binrw::{BinRead, BinWrite};
 pub struct SwitchData {
     #[brw(pad_before = 1)]
     #[brw(pad_after = 1)]
-    range_index: RangeIndex,
+    range_index: RangeCode,
 
     #[brw(pad_after = 1)]
     command: Command,

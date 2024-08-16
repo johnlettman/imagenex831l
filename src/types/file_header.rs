@@ -3,7 +3,7 @@ use crate::types::{
         absorption, datetime, pulse_length, real_time_prf, sector_size, sound_velocity, start_gain,
         train_angle,
     },
-    Config, DataSizeIndex, MotionConfig, RangeIndex, SensorAvailable, SensorInformation,
+    Config, DataSizeIndex, MotionConfig, RangeCode, SensorAvailable, SensorInformation,
 };
 use binrw::{BinRead, BinWrite};
 use chrono::{DateTime, Utc};
@@ -45,7 +45,7 @@ pub struct FileHeader {
     #[bw(write_with = train_angle::write)]
     train_angle: u16,
 
-    range_code: RangeIndex,
+    range_code: RangeCode,
 
     #[br(parse_with = absorption::parse)]
     #[bw(write_with = absorption::write)]

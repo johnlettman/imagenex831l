@@ -1,6 +1,6 @@
 use crate::types::{
     primitive::{profile_range, u14},
-    Acceleration, Angle, HeadPosition, RangeIndex, SonarReturnMagic, SonarReturnStatus, SonarType,
+    Acceleration, Angle, HeadPosition, RangeCode, SonarReturnMagic, SonarReturnStatus, SonarType,
 };
 use binrw::{BinRead, BinWrite};
 
@@ -10,7 +10,7 @@ pub struct SonarReturnHeader {
     pub sonar_type: SonarType,
     pub status: SonarReturnStatus,
     pub head_position: HeadPosition,
-    pub range_index: RangeIndex,
+    pub range_index: RangeCode,
 
     #[br(parse_with = profile_range::parse)]
     #[bw(write_with = profile_range::write)]
