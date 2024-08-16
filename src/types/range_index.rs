@@ -23,17 +23,17 @@ use std::fmt::{Display, Formatter};
     tsify(into_wasm_abi, from_wasm_abi)
 )]
 pub enum RangeIndex {
-    #[cfg_attr(target_family = "wasm", serde(rename = "12.5cm"))]
-    X12_5cm = 2,
+    #[cfg_attr(target_family = "wasm", serde(rename = "0.125m"))]
+    X0_125m = 2,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "25.0cm"))]
-    X25cm = 4,
+    #[cfg_attr(target_family = "wasm", serde(rename = "0.25m"))]
+    X0_25m = 4,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "50.0cm"))]
-    X50cm = 6,
+    #[cfg_attr(target_family = "wasm", serde(rename = "0.50m"))]
+    X0_50m = 6,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "75.0cm"))]
-    X75cm = 8,
+    #[cfg_attr(target_family = "wasm", serde(rename = "0.75m"))]
+    X0_75m = 8,
 
     #[cfg_attr(target_family = "wasm", serde(rename = "1.0m"))]
     X1m = 10,
@@ -57,10 +57,10 @@ pub enum RangeIndex {
 impl RangeIndex {
     pub fn range(&self) -> f32 {
         match *self {
-            Self::X12_5cm => 0.125,
-            Self::X25cm => 0.250,
-            Self::X50cm => 0.500,
-            Self::X75cm => 0.750,
+            Self::X0_125m => 0.125,
+            Self::X0_25m => 0.250,
+            Self::X0_50m => 0.500,
+            Self::X0_75m => 0.750,
             Self::X1m => 1.0,
             Self::X2m => 2.0,
             Self::X3m => 3.0,
@@ -72,7 +72,7 @@ impl RangeIndex {
 
     pub fn filter_delay(&self) -> f32 {
         match *self {
-            Self::X12_5cm | Self::X25cm | Self::X50cm | Self::X75cm => 0.016,
+            Self::X0_125m | Self::X0_25m | Self::X0_50m | Self::X0_75m => 0.016,
             Self::X1m => 0.020,
             Self::X2m => 0.024,
             Self::X3m => 0.030,
@@ -98,10 +98,10 @@ mod tests {
     #[test]
     fn test_range() {
         let cases = vec![
-            (RangeIndex::X12_5cm, 0.125),
-            (RangeIndex::X25cm, 0.250),
-            (RangeIndex::X50cm, 0.500),
-            (RangeIndex::X75cm, 0.750),
+            (RangeIndex::X0_125m, 0.125),
+            (RangeIndex::X0_25m, 0.250),
+            (RangeIndex::X0_50m, 0.500),
+            (RangeIndex::X0_75m, 0.750),
             (RangeIndex::X1m, 1.0),
             (RangeIndex::X2m, 2.0),
             (RangeIndex::X3m, 3.0),
@@ -120,10 +120,10 @@ mod tests {
     #[test]
     fn test_filter_delay() {
         let cases = vec![
-            (RangeIndex::X12_5cm, 0.016),
-            (RangeIndex::X25cm, 0.016),
-            (RangeIndex::X50cm, 0.016),
-            (RangeIndex::X75cm, 0.016),
+            (RangeIndex::X0_125m, 0.016),
+            (RangeIndex::X0_25m, 0.016),
+            (RangeIndex::X0_50m, 0.016),
+            (RangeIndex::X0_75m, 0.016),
             (RangeIndex::X1m, 0.020),
             (RangeIndex::X2m, 0.024),
             (RangeIndex::X3m, 0.030),
@@ -142,10 +142,10 @@ mod tests {
     #[test]
     fn test_display() {
         let cases = vec![
-            (RangeIndex::X12_5cm, "0.125 meters"),
-            (RangeIndex::X25cm, "0.250 meters"),
-            (RangeIndex::X50cm, "0.500 meters"),
-            (RangeIndex::X75cm, "0.750 meters"),
+            (RangeIndex::X0_125m, "0.125 meters"),
+            (RangeIndex::X0_25m, "0.250 meters"),
+            (RangeIndex::X0_50m, "0.500 meters"),
+            (RangeIndex::X0_75m, "0.750 meters"),
             (RangeIndex::X1m, "1.000 meters"),
             (RangeIndex::X2m, "2.000 meters"),
             (RangeIndex::X3m, "3.000 meters"),
