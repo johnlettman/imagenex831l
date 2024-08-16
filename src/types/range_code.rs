@@ -1,7 +1,7 @@
+use crate::types::{range_table, RangeTable};
 use binrw::{BinRead, BinWrite};
 use num_derive::{FromPrimitive, ToPrimitive};
 use std::fmt::{Display, Formatter};
-use crate::types::{range_table, RangeTable};
 
 #[derive(
     Debug,
