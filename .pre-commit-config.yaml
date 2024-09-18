@@ -3,6 +3,7 @@ default_stages:
 - push
 minimum_pre_commit_version: 2.7.1
 ci:
+  skip: [fmt, cargo-check, end-of-file-fixer]
   autofix_prs: true
   autoupdate_schedule: weekly
 repos:
