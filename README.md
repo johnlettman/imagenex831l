@@ -36,7 +36,7 @@ fn main() {
     for shot in &mut shot_file {
         println!("{shot:#?}");
         break;
-    }    
+    }
 }
 ```
 <details>

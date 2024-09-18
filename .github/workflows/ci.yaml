@@ -3,10 +3,10 @@ name: Continuous Integration
 on:
   pull_request:
   push:
-    branches: [ "main" ]
+    branches: [main]
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.ref }}"
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -19,79 +19,79 @@ jobs:
     name: CI
     needs: [shellcheck, fmt, check, docs, lock, test, coverage]
     runs-on: ubuntu-latest
-    if: "always()"
+    if: always()
     steps:
-      - name: Failed
-        run: exit 1
-        if: "contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')"
+    - name: Failed
+      run: exit 1
+      if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
 
   shellcheck:
     name: Check shell scripts
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install shellcheck
-        run: sudo apt install -y shellcheck
-      - name: Run shellcheck
-        run: shellcheck ./scripts/*
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install shellcheck
+      run: sudo apt install -y shellcheck
+    - name: Run shellcheck
+      run: shellcheck ./scripts/*
 
   fmt:
     name: Check formatting
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-          components: rustfmt
-      - uses: Swatinem/rust-cache@v2
-      - name: Check formatting
-        run: cargo fmt --all -- --check
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: stable
+        components: rustfmt
+    - uses: Swatinem/rust-cache@v2
+    - name: Check formatting
+      run: cargo fmt --all -- --check
 
   check:
     name: Cargo check
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Check
-        run: cargo check
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: stable
+    - uses: Swatinem/rust-cache@v2
+    - name: Check
+      run: cargo check
 
   docs:
     name: Check documentation
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Run documentation
-        run: cargo doc --workspace --all-features --no-deps --document-private-items
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: stable
+    - uses: Swatinem/rust-cache@v2
+    - name: Run documentation
+      run: cargo doc --workspace --all-features --no-deps --document-private-items
 
   lock:
     name: Check Cargo.lock
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
-      - name: "Is Cargo.lock up to date?"
-        run: cargo update --locked
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: stable
+    - uses: Swatinem/rust-cache@v2
+    - name: Is Cargo.lock up to date?
+      run: cargo update --locked
 
   test:
     name: Test on ${{ matrix.os }} with Rust ${{ matrix.toolchain }}
@@ -99,62 +99,62 @@ jobs:
       matrix:
         build: [nightly, linux, windows, mac]
         include:
-          - build: nightly
-            os: ubuntu-latest
-            toolchain: nightly
-          - build: linux
-            os: ubuntu-latest
-            toolchain: stable
-          - build: windows
-            os: windows-latest
-            toolchain: stable
-          - build: mac
-            os: macos-latest
-            toolchain: stable
+        - build: nightly
+          os: ubuntu-latest
+          toolchain: nightly
+        - build: linux
+          os: ubuntu-latest
+          toolchain: stable
+        - build: windows
+          os: windows-latest
+          toolchain: stable
+        - build: mac
+          os: macos-latest
+          toolchain: stable
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.rust != 'stable' }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ matrix.toolchain }}
-      - uses: Swatinem/rust-cache@v2
-      - name: Build
-        run: cargo build
-      - name: Test
-        run: cargo test
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ matrix.toolchain }}
+    - uses: Swatinem/rust-cache@v2
+    - name: Build
+      run: cargo build
+    - name: Test
+      run: cargo test
 
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: nightly
-          components: llvm-tools-preview
-      - uses: Swatinem/rust-cache@v2
-      - name: Install llvm-cov
-        uses: taiki-e/install-action@v2
-        with:
-          tool: cargo-llvm-cov
-      - name: Generate coverage
-        run: cargo llvm-cov --doctests
-      - name: Determine if CODECOV_TOKEN is available
-        id: has_codecov
-        run: echo 'result=${{ secrets.CODECOV_TOKEN }}' >> $GITHUB_OUTPUT
-      - name: Generate coverage file
-        run: cargo llvm-cov --doctests --no-run --lcov --output-path lcov.info
-        if: steps.has_codecov.outputs.result != 0
-      - name: Upload to codecov.io
-        uses: codecov/codecov-action@v4
-        with:
-          files: lcov.info
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
-          fail_ci_if_error: false
-        if: steps.has_codecov.outputs.result != 0
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: nightly
+        components: llvm-tools-preview
+    - uses: Swatinem/rust-cache@v2
+    - name: Install llvm-cov
+      uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-llvm-cov
+    - name: Generate coverage
+      run: cargo llvm-cov --doctests
+    - name: Determine if CODECOV_TOKEN is available
+      id: has_codecov
+      run: echo 'result=${{ secrets.CODECOV_TOKEN }}' >> $GITHUB_OUTPUT
+    - name: Generate coverage file
+      run: cargo llvm-cov --doctests --no-run --lcov --output-path lcov.info
+      if: steps.has_codecov.outputs.result != 0
+    - name: Upload to codecov.io
+      uses: codecov/codecov-action@v4
+      with:
+        files: lcov.info
+        token: ${{ secrets.CODECOV_TOKEN }}
+        verbose: true
+        fail_ci_if_error: false
+      if: steps.has_codecov.outputs.result != 0
