@@ -151,7 +151,7 @@ jobs:
       run: cargo llvm-cov --doctests --no-run --lcov --output-path lcov.info
       if: steps.has_codecov.outputs.result != 0
     - name: Upload to codecov.io
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         files: lcov.info
         token: ${{ secrets.CODECOV_TOKEN }}
