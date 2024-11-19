@@ -30,7 +30,7 @@ num-traits = "0.2"
 memmap2 = "0.9"
 git-version = "0.3"
 project-root = "0.2"
-pyo3 = { version = "0.22", optional = true }
+pyo3 = { version = "0.23", optional = true }
 
 [dev-dependencies]
 test-log = "0.2"
