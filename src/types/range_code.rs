@@ -3,6 +3,9 @@ use binrw::{BinRead, BinWrite};
 use num_derive::{FromPrimitive, ToPrimitive};
 use std::fmt::{Display, Formatter};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(
     Debug,
     Eq,
@@ -23,35 +26,40 @@ use std::fmt::{Display, Formatter};
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
     tsify(into_wasm_abi, from_wasm_abi)
 )]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq, ord))]
 pub enum RangeCode {
-    #[cfg_attr(target_family = "wasm", serde(rename = "0.125m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "0.125m"))]
     X0_125m = 2,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "0.25m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "0.25m"))]
     X0_25m = 4,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "0.50m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "0.50m"))]
     X0_50m = 6,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "0.75m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "0.75m"))]
     X0_75m = 8,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "1.0m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "1.0m"))]
     X1m = 10,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "2.0m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "2.0m"))]
     X2m = 20,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "3.0m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "3.0m"))]
     X3m = 30,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "4.0m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "4.0m"))]
     X4m = 40,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "5.0m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "5.0m"))]
     X5m = 50,
 
-    #[cfg_attr(target_family = "wasm", serde(rename = "6.0m"))]
+    #[cfg_attr(feature = "serde", serde(rename = "6.0m"))]
     X6m = 60,
 }
 
@@ -101,6 +109,33 @@ impl Display for RangeCode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let range = self.range();
         write!(f, "{range:.3} meters")
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl RangeCode {
+    pub(crate) fn __str__(&self) -> String {
+        self.to_string()
+    }
+
+    pub(crate) fn __float__(&self) -> f32 {
+        self.range()
+    }
+
+    #[pyo3(name = "range")]
+    pub(crate) fn py_range(&self) -> f32 {
+        self.range()
+    }
+
+    #[pyo3(name = "table")]
+    pub(crate) fn py_table(&self) -> RangeTable {
+        self.table()
+    }
+
+    #[pyo3(name = "filter_delay")]
+    pub(crate) fn py_filter_delay(&self) -> f32 {
+        self.filter_delay()
     }
 }
 

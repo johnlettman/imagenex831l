@@ -1,7 +1,7 @@
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 
-pub const MAX: u16 = 360;
+pub(crate) const MAX: u16 = 360;
 const ERR_RANGE: &'static str = concatcp!("sector size exceeds maximum of ", MAX);
 
 #[inline]

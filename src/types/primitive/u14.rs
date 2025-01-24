@@ -2,7 +2,7 @@ use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 use std::io::{Error as IOError, ErrorKind::InvalidData};
 
-pub const MAX: u16 = 0b0011_1111_1111_1111;
+pub(crate) const MAX: u16 = 0b0011_1111_1111_1111;
 
 const MASK_HIGH: u8 = 0b0111_1110;
 const SHIFT_HIGH: usize = 1;

@@ -5,7 +5,11 @@ use crate::types::{
 use binrw::{BinRead, BinResult, BinWrite, Endian, Error};
 use num_traits::ToPrimitive;
 use std::cmp::Ordering;
+use std::fmt::{Display, Formatter};
 use std::io::{Error as IOError, ErrorKind::InvalidData, Read, Seek, Write};
+
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
 
 #[derive(Debug, Clone, derive_new::new)]
 #[cfg_attr(
@@ -13,14 +17,30 @@ use std::io::{Error as IOError, ErrorKind::InvalidData, Read, Seek, Write};
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
     tsify(into_wasm_abi, from_wasm_abi)
 )]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq, ord))]
 pub struct HeadPosition {
+    #[cfg(not(feature = "pyo3"))]
     pub angle: f32,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub angle: f32,
+
+    #[cfg(not(feature = "pyo3"))]
+    pub direction: Direction,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
     pub direction: Direction,
 }
 
 impl HeadPosition {
-    pub const MIN: f32 = -180.0;
-    pub const MAX: f32 = 180.0;
+    const MIN: f32 = -180.0;
+    const MAX: f32 = 180.0;
 
     const FLAG_DIRECTION: u8 = 0b0100_0000;
     const SHIFT_DIRECTION: usize = 6;
@@ -34,6 +54,12 @@ impl HeadPosition {
 impl Default for HeadPosition {
     fn default() -> Self {
         Self { angle: 0.0, direction: Direction::default() }
+    }
+}
+
+impl Display for HeadPosition {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:.3}° {}", self.angle, self.direction)
     }
 }
 
@@ -114,5 +140,26 @@ impl BinWrite for HeadPosition {
 
         raw.write_options(writer, endian, args)?;
         Ok(())
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl HeadPosition {
+    #[new]
+    pub(crate) fn py_new(angle: f32, direction: Direction) -> Self {
+        Self::new(angle, direction)
+    }
+
+    pub(crate) fn __str__(&self) -> String {
+        self.to_string()
+    }
+
+    pub(crate) fn __repr__(&self) -> String {
+        format!("HeadPosition({:?}, {:?})", self.angle, self.direction)
+    }
+
+    pub(crate) fn __float__(&self) -> f32 {
+        self.angle
     }
 }

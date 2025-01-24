@@ -1,13 +1,21 @@
 use num_derive::{FromPrimitive, ToPrimitive};
 use std::fmt::{Display, Formatter};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(Debug, Eq, PartialEq, Copy, Clone, FromPrimitive, ToPrimitive)]
 #[cfg_attr(
     target_family = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
-    tsify(into_wasm_abi, from_wasm_abi),
-    serde(rename_all = "UPPERCASE")
+    tsify(into_wasm_abi, from_wasm_abi)
 )]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub enum ProfileGrid {
     Off = 0,
     On = 1,
@@ -29,6 +37,38 @@ impl Display for ProfileGrid {
                 Self::On => "on",
             }
         )
+    }
+}
+
+impl From<bool> for ProfileGrid {
+    fn from(value: bool) -> Self {
+        match value {
+            true => Self::On,
+            false => Self::Off,
+        }
+    }
+}
+
+impl Into<bool> for ProfileGrid {
+    fn into(self) -> bool {
+        self == Self::On
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl ProfileGrid {
+    #[new]
+    pub(crate) fn py_new(enable: bool) -> Self {
+        enable.into()
+    }
+
+    pub(crate) fn __str__(&self) -> String {
+        self.to_string()
+    }
+
+    pub(crate) fn __bool__(&self) -> bool {
+        (*self).into()
     }
 }
 

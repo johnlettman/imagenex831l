@@ -1,7 +1,7 @@
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 
-pub const MAX: u16 = 1_000;
+pub(crate) const MAX: u16 = 1_000;
 const ERR_MESSAGE_RANGE: &'static str = concatcp!("pulse length exceeds maximum of ", MAX, " μs");
 
 #[inline]

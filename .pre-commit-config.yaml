@@ -1,6 +1,6 @@
 default_stages:
-- Nonepre-commitNone
-- Nonepre-pushNone
+- pre-commit
+- pre-push
 minimum_pre_commit_version: 2.7.1
 ci:
   skip: [fmt, cargo-check, end-of-file-fixer]

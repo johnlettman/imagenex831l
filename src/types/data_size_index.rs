@@ -2,12 +2,26 @@ use binrw::{BinRead, BinWrite};
 use num_derive::{FromPrimitive, ToPrimitive};
 use std::fmt::{Display, Formatter};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 /// Size index of the sonar data field.
 /// The IMAGENEX documentation refers to this as `nToReadIndex`.
 #[derive(Debug, BinRead, BinWrite, Eq, PartialEq, Copy, Clone, ToPrimitive, FromPrimitive)]
 #[repr(u8)]
 #[brw(repr = u8)]
+#[cfg_attr(
+    target_family = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub enum DataSizeIndex {
+    #[cfg_attr(feature = "serde", serde(rename = "250_bytes"))]
     X250Bytes = 2,
 }
 
@@ -34,6 +48,23 @@ impl Display for DataSizeIndex {
                 Self::X250Bytes => "250 bytes",
             }
         )
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl DataSizeIndex {
+    pub(crate) fn __str__(&self) -> String {
+        self.to_string()
+    }
+
+    pub(crate) fn __int__(&self) -> usize {
+        self.bytes()
+    }
+
+    #[pyo3(name = "bytes")]
+    pub(crate) fn py_bytes(&self) -> usize {
+        self.bytes()
     }
 }
 

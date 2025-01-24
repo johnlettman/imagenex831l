@@ -1,7 +1,7 @@
 use crate::types::{primitive::u14, RangeCode};
-use binrw::{parser, writer, BinResult, BinWrite};
+use binrw::{parser, writer, BinResult};
 
-const SCALE: f32 = 0.0005;
+pub(crate) const SCALE: f32 = 0.0005;
 
 #[parser(reader, endian)]
 pub fn parse(range_index: RangeCode) -> BinResult<f32> {

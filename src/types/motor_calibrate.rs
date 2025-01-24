@@ -1,22 +1,30 @@
 use num_derive::{FromPrimitive, ToPrimitive};
 use std::fmt::{Display, Formatter};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(Debug, Eq, PartialEq, Copy, Clone, ToPrimitive, FromPrimitive)]
 #[repr(u8)]
 #[cfg_attr(
     target_family = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
-    tsify(into_wasm_abi, from_wasm_abi),
-    serde(rename_all = "UPPERCASE")
+    tsify(into_wasm_abi, from_wasm_abi)
 )]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub enum MotorCalibrate {
-    Normal = 0,
+    NoCalibrate = 0,
     Calibrate = 1,
 }
 
 impl Default for MotorCalibrate {
     fn default() -> Self {
-        Self::Normal
+        Self::NoCalibrate
     }
 }
 
@@ -26,10 +34,42 @@ impl Display for MotorCalibrate {
             f,
             "{}",
             match *self {
-                Self::Normal => "normal operation",
+                Self::NoCalibrate => "normal operation",
                 Self::Calibrate => "calibrate sonar head transducer",
             }
         )
+    }
+}
+
+impl From<bool> for MotorCalibrate {
+    fn from(value: bool) -> Self {
+        match value {
+            false => Self::NoCalibrate,
+            true => Self::Calibrate,
+        }
+    }
+}
+
+impl Into<bool> for MotorCalibrate {
+    fn into(self) -> bool {
+        self == Self::Calibrate
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl MotorCalibrate {
+    #[new]
+    pub(crate) fn py_new(calibrate: bool) -> Self {
+        calibrate.into()
+    }
+
+    pub(crate) fn __str__(&self) -> String {
+        self.to_string()
+    }
+
+    pub(crate) fn __bool__(&self) -> bool {
+        (*self).into()
     }
 }
 
@@ -42,7 +82,7 @@ mod tests {
     use test_log::test;
 
     const PRIMITIVE_CASES: [(MotorCalibrate, u8); 2] =
-        [(MotorCalibrate::Normal, 0), (MotorCalibrate::Calibrate, 1)];
+        [(MotorCalibrate::NoCalibrate, 0), (MotorCalibrate::Calibrate, 1)];
 
     #[test]
     fn test_from_primitive() {
@@ -65,13 +105,13 @@ mod tests {
     #[test]
     fn test_default() {
         let got = MotorCalibrate::default();
-        assert_eq!(MotorCalibrate::Normal, got);
+        assert_eq!(MotorCalibrate::NoCalibrate, got);
     }
 
     #[test]
     fn test_display() {
         let cases = vec![
-            (MotorCalibrate::Normal, "normal operation"),
+            (MotorCalibrate::NoCalibrate, "normal operation"),
             (MotorCalibrate::Calibrate, "calibrate sonar head transducer"),
         ];
 

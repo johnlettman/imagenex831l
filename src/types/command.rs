@@ -1,6 +1,5 @@
 use crate::types::util::primitive::{read_u8_bits, write_u8_bits};
 use crate::types::{ProfilePointDetection, StepDirection};
-use binrw::__private::Required;
 use binrw::meta::{EndianKind, ReadEndian, WriteEndian};
 use binrw::{BinRead, BinResult, BinWrite, Endian};
 use std::io::{Read, Seek, Write};
@@ -10,9 +9,33 @@ const SHIFT_STEP_DIRECTION: usize = 6;
 
 const MASK_PROFILE_POINT_DETECTION: u8 = 0b0000_0001;
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(Debug, Clone, Eq, PartialEq, derive_new::new)]
+#[cfg_attr(
+    target_family = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub struct Command {
+    #[cfg(not(feature = "pyo3"))]
     pub profile_point_detection: ProfilePointDetection,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub profile_point_detection: ProfilePointDetection,
+
+    #[cfg(not(feature = "pyo3"))]
+    pub step_direction: StepDirection,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
     pub step_direction: StepDirection,
 }
 

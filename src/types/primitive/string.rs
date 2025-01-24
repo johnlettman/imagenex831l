@@ -1,5 +1,4 @@
 use binrw::{parser, writer, BinResult, Error};
-use std::io::{Read, Seek};
 use std::str::from_utf8;
 
 #[parser(reader)]

@@ -1,11 +1,11 @@
 use crate::types::SonarType;
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
-pub const MIN_SCANNING: f32 = 2.15;
-pub const MAX_SCANNING: f32 = 2.35;
+pub(crate) const MIN_SCANNING: f32 = 2.15;
+pub(crate) const MAX_SCANNING: f32 = 2.35;
 
-pub const MIN_FIXED_POSITION: f32 = 0.9;
-pub const MAX_FIXED_POSITION: f32 = 1.1;
+pub(crate) const MIN_FIXED_POSITION: f32 = 0.9;
+pub(crate) const MAX_FIXED_POSITION: f32 = 1.1;
 
 const ERR_MESSAGE_RANGE: &'static str = "frequency exceeds range";
 

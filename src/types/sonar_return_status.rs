@@ -1,13 +1,56 @@
 use binrw::meta::{EndianKind, ReadEndian, WriteEndian};
 use binrw::{BinRead, BinResult, BinWrite, Endian};
+use std::fmt::Display;
 use std::io::{Read, Seek, Write};
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
+#[derive(Debug, Eq, PartialEq, Clone, derive_new::new)]
+#[cfg_attr(
+    target_family = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub struct SonarReturnStatus {
+    #[cfg(not(feature = "pyo3"))]
     pub range_error: bool,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub range_error: bool,
+
+    #[cfg(not(feature = "pyo3"))]
     pub frequency_error: bool,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub frequency_error: bool,
+
+    #[cfg(not(feature = "pyo3"))]
     pub internal_sensor_error: bool,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub internal_sensor_error: bool,
+
+    #[cfg(not(feature = "pyo3"))]
     pub calibration_error: bool,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub calibration_error: bool,
+
+    #[cfg(not(feature = "pyo3"))]
+    pub switches_accepted: bool,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
     pub switches_accepted: bool,
 }
 
@@ -35,6 +78,39 @@ impl Default for SonarReturnStatus {
             calibration_error: false,
             switches_accepted: false,
         }
+    }
+}
+
+impl Display for SonarReturnStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let mut messages = Vec::new();
+
+        if self.has_error() {
+            if self.range_error {
+                messages.push("range error");
+            }
+
+            if self.frequency_error {
+                messages.push("frequency error");
+            }
+
+            if self.internal_sensor_error {
+                messages.push("internal sensor error");
+            }
+
+            if self.calibration_error {
+                messages.push("calibration error");
+            }
+        } else {
+            messages.push("no errors");
+        }
+
+        if self.switches_accepted {
+            messages.push("switches accepted");
+        }
+
+        let message = messages.join(", ");
+        write!(f, "{}", message)
     }
 }
 
@@ -118,6 +194,47 @@ impl BinWrite for SonarReturnStatus {
         _: Self::Args<'_>,
     ) -> BinResult<()> {
         self.write(writer)
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl SonarReturnStatus {
+    #[new]
+    pub(crate) fn py_new(
+        range_error: bool,
+        frequency_error: bool,
+        internal_sensor_error: bool,
+        calibration_error: bool,
+        switches_accepted: bool,
+    ) -> Self {
+        Self::new(
+            range_error,
+            frequency_error,
+            internal_sensor_error,
+            calibration_error,
+            switches_accepted,
+        )
+    }
+
+    pub(crate) fn __str__(&self) -> String {
+        self.to_string()
+    }
+
+    pub(crate) fn __repr__(&self) -> String {
+        format!(
+            "SonarReturnStatus(\
+        range_error={:?}, \
+        frequency_error={:?}, \
+        internal_sensor_error={:?}, \
+        calibration_error={:?}, \
+        switches_accepted={:?})",
+            self.range_error,
+            self.frequency_error,
+            self.internal_sensor_error,
+            self.calibration_error,
+            self.switches_accepted
+        )
     }
 }
 

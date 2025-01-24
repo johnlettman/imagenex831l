@@ -1,7 +1,7 @@
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
-pub const MIN: f32 = 0.0;
-pub const MAX: f32 = 327.67;
+pub(crate) const MIN: f32 = 0.0;
+pub(crate) const MAX: f32 = 327.67;
 
 const MASK: u16 = 0b0111_1111_1111_1111;
 

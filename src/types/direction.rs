@@ -1,14 +1,22 @@
 use num_derive::{FromPrimitive, ToPrimitive};
 use std::fmt::{Display, Formatter};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(Debug, Eq, PartialEq, Copy, Clone, FromPrimitive, ToPrimitive)]
 #[repr(u8)]
 #[cfg_attr(
     target_family = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
-    tsify(into_wasm_abi, from_wasm_abi),
-    serde(rename_all = "UPPERCASE")
+    tsify(into_wasm_abi, from_wasm_abi)
 )]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub enum Direction {
     Counterclockwise = 0,
     Clockwise = 1,
@@ -30,6 +38,14 @@ impl Display for Direction {
                 Self::Counterclockwise => "counterclockwise",
             }
         )
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl Direction {
+    pub(crate) fn __str__(&self) -> String {
+        self.to_string()
     }
 }
 
