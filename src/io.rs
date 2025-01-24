@@ -6,7 +6,7 @@ use pyo3::{exceptions::PyIOError, intern, prelude::*, types::PyString};
 use pyo3_file::PyFileLikeObject;
 use std::fs::File;
 use std::io::{Cursor, Read, Seek, SeekFrom};
-#[cfg(not(target_family = "wasm"))]
+#[cfg(unix)]
 use std::os::fd::{AsRawFd, FromRawFd};
 use std::path::Path;
 use std::{fs, slice};
@@ -134,11 +134,11 @@ impl Reader {
                     if has_fileno {
                         let fd = f.as_raw_fd();
                         let file = unsafe { File::from_raw_fd(fd) };
-                        Reader::from_file(file).map_err(|e| {
+                        return Reader::from_file(file).map_err(|e| {
                             pyo3::exceptions::PyIOError::new_err(format!(
                                 "Failed to create Reader: {e}"
                             ))
-                        })
+                        });
                     }
 
                     // If no valid file descriptor, fall back to reading data into memory
