@@ -40,17 +40,13 @@ enum Commands {
     #[clap(name = "gui", about = "Show the Graphical User Interface", long_about = None)]
     GUI,
 
-    #[clap(name = "completion", about = "Generation completion script.", long_about = None)]
-    Completion {
-        #[clap(subcommand)]
-        subcommand: CompletionCommand,
-    },
-
-    #[clap(name = "covert", about = "Convert sonar files to other formats.")]
-    Convert {
-        #[args()]
-        to: ToFormats,
-    },
+    // #[clap(name = "completion", about = "Generation completion script.", long_about = None)]
+    // Completion {
+    //     #[clap(subcommand)]
+    //     subcommand: CompletionCommand,
+    // },
+    #[clap(name = "convert", about = "Convert sonar files to other formats.")]
+    Convert { to: ToFormats },
 }
 
 pub fn cli_match() -> Result<()> {
@@ -62,24 +58,24 @@ pub fn cli_match() -> Result<()> {
 
     match &cli.command {
         Commands::GUI => panic!("Hello"),
-        Commands::Completion { subcommand } => {
-            let mut app = Cli::command();
-            match subcommand {
-                CompletionCommand::Bash => {
-                    generate(Bash, &mut app, "i831", &mut std::io::stdout());
-                },
-                CompletionCommand::Zsh => {
-                    generate(Zsh, &mut app, "i831", &mut std::io::stdout());
-                },
-                CompletionCommand::Fish => {
-                    generate(Fish, &mut app, "i831", &mut std::io::stdout());
-                },
-                CompletionCommand::PowerShell => {
-                    generate(PowerShell, &mut app, "i831", &mut std::io::stdout());
-                },
-                _ => (),
-            }
-        },
+        // Commands::Completion { subcommand } => {
+        //     let mut app = Cli::command();
+        //     match subcommand {
+        //         CompletionCommand::Bash => {
+        //             generate(Bash, &mut app, "i831", &mut std::io::stdout());
+        //         },
+        //         CompletionCommand::Zsh => {
+        //             generate(Zsh, &mut app, "i831", &mut std::io::stdout());
+        //         },
+        //         CompletionCommand::Fish => {
+        //             generate(Fish, &mut app, "i831", &mut std::io::stdout());
+        //         },
+        //         CompletionCommand::PowerShell => {
+        //             generate(PowerShell, &mut app, "i831", &mut std::io::stdout());
+        //         },
+        //         _ => (),
+        //     }
+        // },
         Commands::Convert => {},
     }
 
