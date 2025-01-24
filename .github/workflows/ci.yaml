@@ -17,7 +17,7 @@ env:
 jobs:
   ci:
     name: CI
-    needs: [shellcheck, fmt, check, docs, lock, test, coverage]
+    needs: [shellcheck, fmt, check, docs, test, coverage]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -64,6 +64,8 @@ jobs:
     - uses: Swatinem/rust-cache@v2
     - name: Check
       run: cargo check
+    - name: Is Cargo.lock up to date?
+      run: cargo update --locked
 
   docs:
     name: Check documentation
@@ -78,20 +80,6 @@ jobs:
     - uses: Swatinem/rust-cache@v2
     - name: Run documentation
       run: cargo doc --workspace --all-features --no-deps --document-private-items
-
-  lock:
-    name: Check Cargo.lock
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: stable
-    - uses: Swatinem/rust-cache@v2
-    - name: Is Cargo.lock up to date?
-      run: cargo update --locked
 
   test:
     name: Test on ${{ matrix.os }} with Rust ${{ matrix.toolchain }}
