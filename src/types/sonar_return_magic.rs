@@ -96,7 +96,7 @@ impl BinWrite for SonarReturnMagic {
             Self::IPX => b"IPX",
         };
 
-        writer.write(raw)?;
+        writer.write_all(raw)?;
         Ok(())
     }
 

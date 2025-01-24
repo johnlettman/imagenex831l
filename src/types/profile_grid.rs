@@ -49,12 +49,6 @@ impl From<bool> for ProfileGrid {
     }
 }
 
-impl Into<bool> for ProfileGrid {
-    fn into(self) -> bool {
-        self == Self::On
-    }
-}
-
 #[cfg(feature = "pyo3")]
 #[pymethods]
 impl ProfileGrid {

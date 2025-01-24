@@ -25,11 +25,12 @@ pub struct Angle {
 
 impl Angle {
     const SCALE: f32 = 0.025;
-    const MAX: f32 = i14f2::MAX as f32 * Self::SCALE;
-    const MIN: f32 = i14f2::MIN as f32 * Self::SCALE;
+    pub(crate) const MAX: f32 = i14f2::MAX as f32 * Self::SCALE;
+    pub(crate) const MIN: f32 = i14f2::MIN as f32 * Self::SCALE;
 
+    #[inline]
     pub fn valid_angle(angle: f32) -> bool {
-        Self::MIN <= angle && angle <= Self::MAX
+        (Self::MIN..=Self::MAX).contains(&angle)
     }
 
     pub fn valid(&self) -> bool {

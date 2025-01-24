@@ -2,11 +2,11 @@ use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
 pub(crate) const MIN: f32 = 0.0;
 pub(crate) const MAX: f32 = 2.55;
-const ERR_MESSAGE_RANGE: &'static str = "absorption exceeds range from 0.0 to 2.55 dB/m";
+const ERR_MESSAGE_RANGE: &str = "absorption exceeds range from 0.0 to 2.55 dB/m";
 
 #[inline]
 pub fn valid(absorption: f32) -> bool {
-    MIN <= absorption && absorption <= MAX
+    (MIN..MAX).contains(&absorption)
 }
 
 #[parser(reader)]

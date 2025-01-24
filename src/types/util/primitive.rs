@@ -2,9 +2,9 @@ use binrw::{BinResult, Error};
 use num_traits::{FromPrimitive, ToPrimitive};
 use std::any::type_name;
 
-const ERR_MESSAGE_INVALID_VALUE: &'static str = "invalid value for";
+const ERR_MESSAGE_INVALID_VALUE: &str = "invalid value for";
 
-const ERR_MESSAGE_CONVERT: &'static str = "failed to convert raw value for ";
+const ERR_MESSAGE_CONVERT: &str = "failed to convert raw value for ";
 
 pub(crate) fn read_u8<T>(raw: u8, pos: u64) -> BinResult<T>
 where

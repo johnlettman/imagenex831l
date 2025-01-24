@@ -2,13 +2,12 @@ use crate::types::primitive::string;
 use binrw::{parser, writer, BinResult, Endian, Error};
 use chrono::{DateTime, NaiveDate, NaiveTime, TimeDelta, Utc};
 
-pub(crate) const DATE_FORMAT: &'static str = "%d-%b-%Y";
-pub(crate) const TIME_FORMAT: &'static str = "%H:%M:%S";
+pub(crate) const DATE_FORMAT: &str = "%d-%b-%Y";
+pub(crate) const TIME_FORMAT: &str = "%H:%M:%S";
 
 pub(crate) const DATE_LENGTH: usize = 12;
 pub(crate) const TIME_LENGTH: usize = 9;
 pub(crate) const HUNDREDTHS_LENGTH: usize = 4;
-pub(crate) const TOTAL_LENGTH: usize = DATE_LENGTH + TIME_LENGTH + HUNDREDTHS_LENGTH;
 
 const ENDIAN: Endian = Endian::NATIVE;
 

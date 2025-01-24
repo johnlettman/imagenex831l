@@ -2,8 +2,20 @@ name: Continuous Integration
 
 on:
   pull_request:
+    branches: [main]
+    paths:
+    - '**.rs'
+    - Cargo.toml
+    - Cargo.toml
+    - rustfmt.toml
   push:
     branches: [main]
+    paths:
+    - '**.rs'
+    - Cargo.toml
+    - Cargo.toml
+    - rustfmt.toml
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

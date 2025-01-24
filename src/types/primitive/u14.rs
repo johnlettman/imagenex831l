@@ -12,7 +12,7 @@ const SHIFT_HIGH_L: usize = 7;
 
 const MASK_LOW: u8 = 0b0111_1111;
 
-const ERR_MESSAGE_RANGE: &'static str = concatcp!("u14 exceeds maximum of ", MAX);
+const ERR_MESSAGE_RANGE: &str = concatcp!("u14 exceeds maximum of ", MAX);
 
 #[inline]
 pub fn valid(u14: u16) -> bool {

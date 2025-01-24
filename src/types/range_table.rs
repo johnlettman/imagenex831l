@@ -1,3 +1,5 @@
+#![allow(clippy::approx_constant)]
+
 pub type RangeTable = [f32; 250];
 
 // Range: 0.125m

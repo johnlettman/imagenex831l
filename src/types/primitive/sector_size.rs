@@ -2,7 +2,7 @@ use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 
 pub(crate) const MAX: u16 = 360;
-const ERR_RANGE: &'static str = concatcp!("sector size exceeds maximum of ", MAX);
+const ERR_RANGE: &str = concatcp!("sector size exceeds maximum of ", MAX);
 
 #[inline]
 pub fn valid(sector_size: u16) -> bool {

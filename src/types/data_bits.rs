@@ -40,7 +40,7 @@ impl DataBits {
 
 impl PartialOrd<Self> for DataBits {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.bits().partial_cmp(&other.bits())
+        Some(self.cmp(other))
     }
 }
 

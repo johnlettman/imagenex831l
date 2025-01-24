@@ -56,7 +56,7 @@ impl Ord for Logf {
 
 impl PartialOrd for Logf {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.to_u8().partial_cmp(&other.to_u8())
+        Some(self.cmp(other))
     }
 }
 

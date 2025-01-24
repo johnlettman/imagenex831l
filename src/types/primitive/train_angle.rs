@@ -3,7 +3,7 @@ use const_format::concatcp;
 
 pub(crate) const MIN: u16 = 0;
 pub(crate) const MAX: u16 = 360;
-const ERR_MESSAGE_RANGE: &'static str =
+const ERR_MESSAGE_RANGE: &str =
     concatcp!("train angle exceeds maximum of ", MIN, "° to ", MAX, "°");
 
 #[inline]

@@ -6,7 +6,7 @@ use std::io::{Read, Seek, Write};
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-#[derive(Debug, Eq, PartialEq, Clone, derive_new::new)]
+#[derive(Debug, Default, Eq, PartialEq, Clone, derive_new::new)]
 #[cfg_attr(
     target_family = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
@@ -66,18 +66,6 @@ impl SonarReturnStatus {
             || self.frequency_error
             || self.internal_sensor_error
             || self.calibration_error
-    }
-}
-
-impl Default for SonarReturnStatus {
-    fn default() -> Self {
-        Self {
-            range_error: false,
-            frequency_error: false,
-            internal_sensor_error: false,
-            calibration_error: false,
-            switches_accepted: false,
-        }
     }
 }
 

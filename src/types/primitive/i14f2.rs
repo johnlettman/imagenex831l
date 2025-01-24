@@ -15,11 +15,11 @@ const MASK_I14_LOW: u8 = 0b1111_1111;
 const SIGN_I14: u16 = 0b0010_0000_0000_0000;
 const SIGN_I16_FILL: u16 = 0b1100_0000_0000_0000;
 
-const ERR_MESSAGE_RANGE: &'static str =
-    concatcp!("Invalid i14, exceeds range from ", MIN, " to ", MAX);
+const ERR_MESSAGE_RANGE: &str = concatcp!("Invalid i14, exceeds range from ", MIN, " to ", MAX);
 
+#[inline]
 pub fn valid_i14(i14: i16) -> bool {
-    MIN <= i14 && i14 <= MAX
+    (MIN..MAX).contains(&i14)
 }
 
 #[parser(reader, endian)]

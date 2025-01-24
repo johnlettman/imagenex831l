@@ -7,7 +7,7 @@ pub(crate) const MAX_SCANNING: f32 = 2.35;
 pub(crate) const MIN_FIXED_POSITION: f32 = 0.9;
 pub(crate) const MAX_FIXED_POSITION: f32 = 1.1;
 
-const ERR_MESSAGE_RANGE: &'static str = "frequency exceeds range";
+const ERR_MESSAGE_RANGE: &str = "frequency exceeds range";
 
 fn offset_for(sonar_type: SonarType) -> f32 {
     match sonar_type {
@@ -18,10 +18,8 @@ fn offset_for(sonar_type: SonarType) -> f32 {
 
 pub fn valid_for(sonar_type: SonarType, frequency: f32) -> bool {
     match sonar_type {
-        SonarType::Scanning => MIN_SCANNING <= frequency && frequency <= MAX_SCANNING,
-        SonarType::FixedPosition => {
-            MIN_FIXED_POSITION <= frequency && frequency <= MAX_FIXED_POSITION
-        },
+        SonarType::Scanning => (MIN_SCANNING..MAX_SCANNING).contains(&frequency),
+        SonarType::FixedPosition => (MIN_FIXED_POSITION..MAX_FIXED_POSITION).contains(&frequency),
     }
 }
 

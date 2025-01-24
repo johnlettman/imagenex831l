@@ -7,11 +7,11 @@ pub(crate) const V_VALUE: f32 = 1500.0;
 const MASK: u16 = 0b0111_1111_1111_1111;
 const MASK_V: u16 = 0b1000_0000_0000_0000;
 
-const ERR_MESSAGE_RANGE: &'static str = "sound velocity exceeds range from 0.0 to 3276.7 m/s";
+const ERR_MESSAGE_RANGE: &str = "sound velocity exceeds range from 0.0 to 3276.7 m/s";
 
 #[inline]
 pub fn valid(sound_velocity: f32) -> bool {
-    MIN <= sound_velocity && sound_velocity <= MAX
+    (MIN..MAX).contains(&sound_velocity)
 }
 
 #[parser(reader, endian)]

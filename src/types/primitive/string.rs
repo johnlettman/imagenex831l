@@ -21,7 +21,7 @@ pub fn write(data: String, length: usize) -> BinResult<()> {
     let pos = writer.stream_position()?;
     let buffer_length = data.len().min(length);
 
-    buffer[..buffer_length].copy_from_slice((&data[..buffer_length]).as_ref());
+    buffer[..buffer_length].copy_from_slice(data[..buffer_length].as_ref());
     writer.write_all(&buffer).map_err(|e| Error::Custom { pos, err: Box::new(e) })
 }
 

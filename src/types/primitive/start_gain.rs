@@ -3,12 +3,12 @@ use const_format::concatcp;
 
 pub(crate) const MIN: u8 = 0;
 pub(crate) const MAX: u8 = 255;
-const ERR_MESSAGE_RANGE: &'static str =
+const ERR_MESSAGE_RANGE: &str =
     concatcp!("start gain exceeds maximum of ", MIN, " to ", MAX, " dB");
 
 #[inline]
-pub fn valid(start_gain: u8) -> bool {
-    MIN <= start_gain && start_gain <= MAX
+pub fn valid(_: u8) -> bool {
+    true // any u8 is valid here
 }
 
 #[parser(reader, endian)]

@@ -4,9 +4,8 @@ use binrw::BinRead;
 use pyo3::{exceptions::PyIOError, intern, prelude::*, types::PyString};
 #[cfg(feature = "pyo3")]
 use pyo3_file::PyFileLikeObject;
-use std::fs::File;
 use std::io::{Cursor, Read, Seek, SeekFrom};
-#[cfg(unix)]
+#[cfg(all(unix, not(target_family = "wasm"), feature = "pyo3"))]
 use std::os::fd::{AsRawFd, FromRawFd};
 use std::path::Path;
 use std::{fs, slice};

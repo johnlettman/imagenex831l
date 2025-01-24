@@ -51,12 +51,6 @@ impl From<bool> for SensorAvailable {
     }
 }
 
-impl Into<bool> for SensorAvailable {
-    fn into(self) -> bool {
-        self == SensorAvailable::Available
-    }
-}
-
 #[cfg(feature = "pyo3")]
 #[pymethods]
 impl SensorAvailable {

@@ -50,12 +50,6 @@ impl From<bool> for MotorCalibrate {
     }
 }
 
-impl Into<bool> for MotorCalibrate {
-    fn into(self) -> bool {
-        self == Self::Calibrate
-    }
-}
-
 #[cfg(feature = "pyo3")]
 #[pymethods]
 impl MotorCalibrate {

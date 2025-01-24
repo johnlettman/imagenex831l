@@ -2,7 +2,6 @@ mod acceleration;
 mod angle;
 mod command;
 mod config;
-mod data;
 mod data_bits;
 mod data_size_index;
 mod direction;

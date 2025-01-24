@@ -5,10 +5,10 @@ pub(crate) const MAX: f32 = 327.67;
 
 const MASK: u16 = 0b0111_1111_1111_1111;
 
-const ERR_MESSAGE_RANGE: &'static str = "real-time pRF exceeds range of 0.0 to 327.67 Hz";
+const ERR_MESSAGE_RANGE: &str = "real-time pRF exceeds range of 0.0 to 327.67 Hz";
 
 pub fn valid(real_time_prf: f32) -> bool {
-    MIN <= real_time_prf && real_time_prf <= MAX
+    (MIN..MAX).contains(&real_time_prf)
 }
 
 #[parser(reader, endian)]
