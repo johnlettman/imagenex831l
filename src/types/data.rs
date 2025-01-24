@@ -1,6 +1,10 @@
 use binrw::meta::{EndianKind, ReadEndian, WriteEndian};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(Debug, derive_new::new)]
+#[cfg_attr(feature = "pyo3", pyclass)]
 pub struct Data {
     pub echos: Option<Vec<f32>>,
 }

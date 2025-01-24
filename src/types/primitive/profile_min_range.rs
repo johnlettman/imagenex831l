@@ -1,7 +1,7 @@
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
-pub const MIN: f32 = 0.0;
-pub const MAX: f32 = 250.0;
+pub(crate) const MIN: f32 = 0.0;
+pub(crate) const MAX: f32 = 250.0;
 
 const ERR_MESSAGE_RANGE: &'static str = "profile minimum range exceeds range from 0.0m to 250.0m";
 

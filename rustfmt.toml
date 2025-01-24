@@ -5,12 +5,7 @@ use_small_heuristics = "Max"
 newline_style = "Unix"
 
 # Normalization
-normalize_doc_attributes = true
 match_block_trailing_comma = true
-trailing_comma = "Vertical"
 
 # Imports
-group_imports = "StdExternalCrate"
-imports_layout = "HorizontalVertical"
-imports_granularity = "Crate"
 reorder_imports = true

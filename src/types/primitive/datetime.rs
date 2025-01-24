@@ -1,16 +1,14 @@
 use crate::types::primitive::string;
 use binrw::{parser, writer, BinResult, Endian, Error};
-use chrono::{DateTime, NaiveDate, NaiveTime, TimeDelta, Timelike, Utc};
-use std::io::Seek;
-use std::str::from_utf8;
+use chrono::{DateTime, NaiveDate, NaiveTime, TimeDelta, Utc};
 
-const DATE_FORMAT: &'static str = "%d-%b-%Y";
-const TIME_FORMAT: &'static str = "%H:%M:%S";
+pub(crate) const DATE_FORMAT: &'static str = "%d-%b-%Y";
+pub(crate) const TIME_FORMAT: &'static str = "%H:%M:%S";
 
-const DATE_BYTES_LENGTH: usize = 12;
-const TIME_BYTES_LENGTH: usize = 9;
-const HUNDREDTHS_BYTES_LENGTH: usize = 4;
-const TOTAL_LENGTH: usize = DATE_BYTES_LENGTH + TIME_BYTES_LENGTH + HUNDREDTHS_BYTES_LENGTH;
+pub(crate) const DATE_LENGTH: usize = 12;
+pub(crate) const TIME_LENGTH: usize = 9;
+pub(crate) const HUNDREDTHS_LENGTH: usize = 4;
+pub(crate) const TOTAL_LENGTH: usize = DATE_LENGTH + TIME_LENGTH + HUNDREDTHS_LENGTH;
 
 const ENDIAN: Endian = Endian::NATIVE;
 
@@ -18,10 +16,9 @@ const SCALE_NANOSECONDS_TO_HUNDREDTHS: u32 = 10_000_000;
 
 #[parser(reader)]
 pub fn parse() -> BinResult<DateTime<Utc>> {
-    let (date_string, date_pos) = string::parse(reader, ENDIAN, (DATE_BYTES_LENGTH,))?;
-    let (time_string, time_pos) = string::parse(reader, ENDIAN, (TIME_BYTES_LENGTH,))?;
-    let (hundredths_string, hundredths_pos) =
-        string::parse(reader, ENDIAN, (HUNDREDTHS_BYTES_LENGTH,))?;
+    let (date_string, date_pos) = string::parse(reader, ENDIAN, (DATE_LENGTH,))?;
+    let (time_string, time_pos) = string::parse(reader, ENDIAN, (TIME_LENGTH,))?;
+    let (hundredths_string, hundredths_pos) = string::parse(reader, ENDIAN, (HUNDREDTHS_LENGTH,))?;
 
     let date = NaiveDate::parse_from_str(date_string.as_str(), DATE_FORMAT)
         .map_err(|e| Error::Custom { pos: date_pos, err: Box::new(e) })?;
@@ -48,9 +45,9 @@ pub fn write(datetime: &DateTime<Utc>) -> BinResult<()> {
     let hundredths = nanoseconds / SCALE_NANOSECONDS_TO_HUNDREDTHS;
     let hundredths_string = format!(".{hundredths:02}");
 
-    string::write(date_string, writer, ENDIAN, (DATE_BYTES_LENGTH,))?;
-    string::write(time_string, writer, ENDIAN, (TIME_BYTES_LENGTH,))?;
-    string::write(hundredths_string, writer, ENDIAN, (HUNDREDTHS_BYTES_LENGTH,))?;
+    string::write(date_string, writer, ENDIAN, (DATE_LENGTH,))?;
+    string::write(time_string, writer, ENDIAN, (TIME_LENGTH,))?;
+    string::write(hundredths_string, writer, ENDIAN, (HUNDREDTHS_LENGTH,))?;
     Ok(())
 }
 

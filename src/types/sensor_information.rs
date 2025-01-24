@@ -3,14 +3,44 @@ use binrw::{BinRead, BinResult, BinWrite, Endian};
 use std::fmt::{Display, Formatter};
 use std::io::{Read, Seek, Write};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 const FLAG_PITCH_VALID: u8 = 0b0000_0001;
 const FLAG_ROLL_VALID: u8 = 0b0000_0010;
 const FLAG_DISTANCE_VALID: u8 = 0b0000_0100;
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone, derive_new::new)]
+#[cfg_attr(
+    target_family = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub struct SensorInformation {
+    #[cfg(not(feature = "pyo3"))]
     pub pitch_valid: bool,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub pitch_valid: bool,
+
+    #[cfg(not(feature = "pyo3"))]
     pub roll_valid: bool,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub roll_valid: bool,
+
+    #[cfg(not(feature = "pyo3"))]
+    pub distance_valid: bool,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
     pub distance_valid: bool,
 }
 
@@ -107,6 +137,26 @@ impl BinWrite for SensorInformation {
         _: Self::Args<'_>,
     ) -> BinResult<()> {
         self.write(writer)
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl SensorInformation {
+    #[new]
+    pub(crate) fn py_new(pitch_valid: bool, roll_valid: bool, distance_valid: bool) -> Self {
+        Self::new(pitch_valid, roll_valid, distance_valid)
+    }
+
+    pub(crate) fn __str__(&self) -> String {
+        self.to_string()
+    }
+
+    pub(crate) fn __repr__(&self) -> String {
+        format!(
+            "SensorInformation(pitch_valid={:?}, roll_valid={:?}, distance_valid={:?})",
+            self.pitch_valid, self.roll_valid, self.distance_valid
+        )
     }
 }
 

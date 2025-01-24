@@ -3,9 +3,22 @@ use binrw::{BinRead, BinResult, BinWrite, Endian};
 use std::cmp::Ordering;
 use std::io::{Read, Seek, Write};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(Debug, Clone, derive_new::new)]
+#[cfg_attr(
+    target_family = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq, ord))]
 pub struct Acceleration {
-    acceleration: f32,
+    pub acceleration: f32,
     new_data: bool,
     error_alarm: bool,
 }
@@ -23,6 +36,18 @@ impl PartialEq for Acceleration {
 impl PartialOrd for Acceleration {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.acceleration.partial_cmp(&other.acceleration)
+    }
+}
+
+impl From<f32> for Acceleration {
+    fn from(acceleration: f32) -> Self {
+        Self { acceleration, new_data: false, error_alarm: false }
+    }
+}
+
+impl From<f64> for Acceleration {
+    fn from(acceleration: f64) -> Self {
+        Self { acceleration: acceleration as f32, new_data: false, error_alarm: false }
     }
 }
 
@@ -52,6 +77,26 @@ impl BinWrite for Acceleration {
         let raw = (self.acceleration / Acceleration::SCALE) as i16;
         let values = (raw, self.new_data, self.error_alarm);
         i14f2::write(&values, writer, endian, args)
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl Acceleration {
+    #[new]
+    pub fn py_new(acceleration: f32) -> PyResult<Self> {
+        Ok(Self { acceleration, new_data: false, error_alarm: false })
+    }
+
+    pub fn __repr__(&self) -> String {
+        format!(
+            "Acceleration({}, new_data = {}, error_alarm = {})",
+            self.acceleration, self.new_data, self.error_alarm
+        )
+    }
+
+    pub fn __str__(&self) -> String {
+        self.acceleration.to_string()
     }
 }
 

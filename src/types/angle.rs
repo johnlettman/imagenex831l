@@ -1,18 +1,32 @@
 use crate::types::primitive::i14f2;
 use binrw::{BinRead, BinResult, BinWrite, Endian};
+use std::cmp::Ordering;
 use std::io::{Read, Seek, Write};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(Debug, Copy, Clone, PartialEq, derive_new::new)]
+#[cfg_attr(
+    target_family = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub struct Angle {
-    angle: f32,
+    pub angle: f32,
     new_data: bool,
     error_alarm: bool,
 }
 
 impl Angle {
-    pub const SCALE: f32 = 0.025;
-    pub const MAX: f32 = i14f2::MAX as f32 * Angle::SCALE;
-    pub const MIN: f32 = i14f2::MIN as f32 * Angle::SCALE;
+    const SCALE: f32 = 0.025;
+    const MAX: f32 = i14f2::MAX as f32 * Self::SCALE;
+    const MIN: f32 = i14f2::MIN as f32 * Self::SCALE;
 
     pub fn valid_angle(angle: f32) -> bool {
         Self::MIN <= angle && angle <= Self::MAX
@@ -20,6 +34,24 @@ impl Angle {
 
     pub fn valid(&self) -> bool {
         Self::valid_angle(self.angle)
+    }
+}
+
+impl PartialOrd<Self> for Angle {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.angle.partial_cmp(&other.angle)
+    }
+}
+
+impl From<f32> for Angle {
+    fn from(angle: f32) -> Self {
+        Self { angle, new_data: false, error_alarm: false }
+    }
+}
+
+impl From<f64> for Angle {
+    fn from(angle: f64) -> Self {
+        Self { angle: angle as f32, new_data: false, error_alarm: false }
     }
 }
 
@@ -49,6 +81,20 @@ impl BinWrite for Angle {
         let raw = (self.angle / Self::SCALE) as i16;
         let values = (raw, self.new_data, self.error_alarm);
         i14f2::write(&values, writer, endian, args)
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl Angle {
+    #[new]
+    pub fn py_new(angle: f32) -> Self {
+        Angle { angle, new_data: false, error_alarm: false }
+    }
+
+    #[pyo3(name = "is_valid")]
+    pub fn py_is_valid(&self) -> bool {
+        Self::valid_angle(self.angle)
     }
 }
 

@@ -15,16 +15,47 @@ const SHIFT_PROFILE_GRID: usize = 7;
 const SHIFT_ZERO: usize = 6;
 const SHIFT_DATA_BITS: usize = 3;
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(Debug, Eq, PartialEq, Clone, derive_new::new)]
 #[cfg_attr(
     target_family = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
     tsify(into_wasm_abi, from_wasm_abi)
 )]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub struct Config {
+    #[cfg(not(feature = "pyo3"))]
     pub profile_grid: ProfileGrid,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub profile_grid: ProfileGrid,
+
+    #[cfg(not(feature = "pyo3"))]
     pub zero: Zero,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub zero: Zero,
+
+    #[cfg(not(feature = "pyo3"))]
     pub data_bits: DataBits,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub data_bits: DataBits,
+
+    #[cfg(not(feature = "pyo3"))]
+    pub logf: Logf,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
     pub logf: Logf,
 }
 
@@ -91,6 +122,22 @@ impl BinWrite for Config {
         _: Self::Args<'_>,
     ) -> BinResult<()> {
         self.write(writer)
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl Config {
+    #[new]
+    fn py_new(profile_grid: ProfileGrid, zero: Zero, data_bits: DataBits, logf: Logf) -> Self {
+        Self::new(profile_grid, zero, data_bits, logf)
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "Config(profile_grid={:?}, zero={:?}, data_bits={:?}, logf={:?})",
+            self.profile_grid, self.zero, self.data_bits, self.logf
+        )
     }
 }
 

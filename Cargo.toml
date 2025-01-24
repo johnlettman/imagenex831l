@@ -1,19 +1,36 @@
 [package]
-name = "imagenex831"
+name = "imagenex831l"
+version = { workspace = true }
+keywords = { workspace = true }
+edition = { workspace = true }
+
+[workspace]
+resolver = "2"
+members = [ "cli" ]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
+keywords = ["imagenex", "pipe", "sonar", "inspection"]
+license = "MIT"
+repository = "https://github.com/johnlettman/imagenex831l"
 
 [lib]
-crate-type = ["cdylib", "lib"]
+name = "imagenex831l"
+crate-type = ["cdylib", "rlib"]
 
-[profile.release]
-lto = true
+[features]
+nightly = ["dep:backtrace"]
+pyo3 = ["dep:pyo3", "dep:pyo3-file", "dep:pyo3-log"]
+serde = ["dep:serde", "chrono/serde"]
+syslog = ["dep:slog-syslog"]
+termlog = ["dep:slog-term"]
+journald = [] # reserved for Linux
 
-[package.metadata.wasm-pack.profile.dev.wasm-bindgen]
-debug-js-glue = true
-demangle-name-section = true
-dwarf-debug-info = true
-
+[dev-dependencies]
+test-log = "0.2"
+assert_matches = "1.5"
+env_logger = { version = "0.11", features = ["default"] }
 
 [dependencies]
 binrw = { version = "0.14" }
@@ -30,17 +47,32 @@ num-traits = "0.2"
 memmap2 = "0.9"
 git-version = "0.3"
 project-root = "0.2"
-pyo3 = { version = "0.23", optional = true }
+pyo3 = { version = "0.23", features = ["extension-module", "chrono"], optional = true }
+pyo3-file = { version = "0.10.0", optional = true }
+pyo3-log = { version = "0.12.1", optional = true }
+backtrace = { version = "0.3.73", optional = true }
+slog = "2.7.0"
+slog-scope = "4.4.0"
+slog-stdlog = "4.1.1"
+slog-async = "2.8.0"
+slog-syslog = { version = "0.13.0", optional = true }
+slog-term = { version = "2.9.1", optional = true }
+once_cell = "1.19.0"
 
-[dev-dependencies]
-test-log = "0.2"
-assert_matches = "1.5"
-env_logger = { version = "0.11", features = ["default"] }
+[target.'cfg(target_os = "linux")'.features]
+journald = ["dep:slog-journald"]
+
+[target.'cfg(target_os = "linux")'.dependencies]
+slog-journald = { version = "2.2.0", optional = true }
+
+[target.'cfg(any(target_arch = "wasm32", target_arch = "wasm64"))'.features]
+default = ["serde"]
 
 [target.'cfg(any(target_arch = "wasm32", target_arch = "wasm64"))'.dependencies]
 wasm-bindgen = "0.2"
 tsify = "0.4"
-serde = { version = "1.0" }
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1.0", optional = false }
 serde-wasm-bindgen = "0.6"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by

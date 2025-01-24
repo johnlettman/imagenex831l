@@ -6,16 +6,47 @@ use binrw::meta::{EndianKind, ReadEndian, WriteEndian};
 use binrw::{BinRead, BinResult, BinWrite, Endian};
 use std::io::{Read, Seek, Write};
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 #[derive(Debug, Eq, PartialEq, Clone, derive_new::new)]
 #[cfg_attr(
     target_family = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
     tsify(into_wasm_abi, from_wasm_abi)
 )]
+#[cfg_attr(
+    all(feature = "serde", not(target_family = "wasm")),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub struct MotionConfig {
+    #[cfg(not(feature = "pyo3"))]
     pub direction: Direction,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub direction: Direction,
+
+    #[cfg(not(feature = "pyo3"))]
     pub transducer: Transducer,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub transducer: Transducer,
+
+    #[cfg(not(feature = "pyo3"))]
     pub mode: Mode,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
+    pub mode: Mode,
+
+    #[cfg(not(feature = "pyo3"))]
+    pub step_size: StepSize,
+
+    #[cfg(feature = "pyo3")]
+    #[pyo3(get, set)]
     pub step_size: StepSize,
 }
 
@@ -94,6 +125,27 @@ impl BinWrite for MotionConfig {
         _: Self::Args<'_>,
     ) -> BinResult<()> {
         self.write(writer)
+    }
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl MotionConfig {
+    #[new]
+    pub(crate) fn py_new(
+        direction: Direction,
+        transducer: Transducer,
+        mode: Mode,
+        step_size: StepSize,
+    ) -> Self {
+        Self::new(direction, transducer, mode, step_size)
+    }
+
+    pub(crate) fn __repr__(&self) -> String {
+        format!(
+            "MotionConfig(direction={:?}, transducer={:?}, mode={:?}, step_size={:?})",
+            self.direction, self.transducer, self.mode, self.step_size
+        )
     }
 }
 

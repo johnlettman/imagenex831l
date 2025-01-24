@@ -1,8 +1,8 @@
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
-pub const MIN: f32 = 0.0;
-pub const MAX: f32 = 3276.7;
-pub const V_VALUE: f32 = 1500.0;
+pub(crate) const MIN: f32 = 0.0;
+pub(crate) const MAX: f32 = 3276.7;
+pub(crate) const V_VALUE: f32 = 1500.0;
 
 const MASK: u16 = 0b0111_1111_1111_1111;
 const MASK_V: u16 = 0b1000_0000_0000_0000;

@@ -1,8 +1,8 @@
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 
-pub const MIN: u8 = 0;
-pub const MAX: u8 = 255;
+pub(crate) const MIN: u8 = 0;
+pub(crate) const MAX: u8 = 255;
 const ERR_MESSAGE_RANGE: &'static str =
     concatcp!("start gain exceeds maximum of ", MIN, " to ", MAX, " dB");
 

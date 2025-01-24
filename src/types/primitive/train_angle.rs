@@ -1,8 +1,8 @@
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 
-pub const MIN: u16 = 0;
-pub const MAX: u16 = 360;
+pub(crate) const MIN: u16 = 0;
+pub(crate) const MAX: u16 = 360;
 const ERR_MESSAGE_RANGE: &'static str =
     concatcp!("train angle exceeds maximum of ", MIN, "° to ", MAX, "°");
 
