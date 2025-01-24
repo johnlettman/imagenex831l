@@ -36,7 +36,7 @@ env_logger = { version = "0.11", features = ["default"] }
 binrw = { version = "0.14" }
 modular-bitfield = "0.11"
 serde = { version = "1.0", optional = true }
-clap = { version = "4.5.24", features = ["derive"] }
+clap = { version = "4.5.27", features = ["derive"] }
 log = { version = "0.4" }
 chrono = { version = "0.4" }
 thiserror = "2.0"
@@ -80,3 +80,6 @@ serde-wasm-bindgen = "0.6"
 # all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
 # code size when deploying.
 console_error_panic_hook = { version = "0.1.6", optional = true }
+
+[target.'cfg(any(target_arch = "wasm32", target_arch = "wasm64"))'.dev-dependencies]
+wasm-bindgen-test = "0.3.50"
