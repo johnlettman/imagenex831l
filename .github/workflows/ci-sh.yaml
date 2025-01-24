@@ -1,0 +1,28 @@
+name: 'CI: Shell'
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+    - '**.sh'
+  push:
+    branches: [main]
+    paths:
+    - '**.sh'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shellcheck:
+    name: Check shell scripts
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install shellcheck
+      run: sudo apt install -y shellcheck
+    - name: Run shellcheck
+      run: shellcheck ./scripts/*
