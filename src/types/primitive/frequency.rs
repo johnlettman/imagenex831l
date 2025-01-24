@@ -18,8 +18,8 @@ fn offset_for(sonar_type: SonarType) -> f32 {
 
 pub fn valid_for(sonar_type: SonarType, frequency: f32) -> bool {
     match sonar_type {
-        SonarType::Scanning => (MIN_SCANNING..MAX_SCANNING).contains(&frequency),
-        SonarType::FixedPosition => (MIN_FIXED_POSITION..MAX_FIXED_POSITION).contains(&frequency),
+        SonarType::Scanning => (MIN_SCANNING..=MAX_SCANNING).contains(&frequency),
+        SonarType::FixedPosition => (MIN_FIXED_POSITION..=MAX_FIXED_POSITION).contains(&frequency),
     }
 }
 
@@ -51,8 +51,6 @@ pub fn write(frequency: &f32, sonar_type: SonarType) -> BinResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use binrw::Endian;
-    use std::io::Cursor;
 
     use log::info;
     use test_log::test;

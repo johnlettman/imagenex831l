@@ -8,7 +8,7 @@ const MASK: u16 = 0b0111_1111_1111_1111;
 const ERR_MESSAGE_RANGE: &str = "real-time pRF exceeds range of 0.0 to 327.67 Hz";
 
 pub fn valid(real_time_prf: f32) -> bool {
-    (MIN..MAX).contains(&real_time_prf)
+    (MIN..=MAX).contains(&real_time_prf)
 }
 
 #[parser(reader, endian)]

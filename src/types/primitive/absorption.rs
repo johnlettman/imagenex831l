@@ -6,7 +6,7 @@ const ERR_MESSAGE_RANGE: &str = "absorption exceeds range from 0.0 to 2.55 dB/m"
 
 #[inline]
 pub fn valid(absorption: f32) -> bool {
-    (MIN..MAX).contains(&absorption)
+    (MIN..=MAX).contains(&absorption)
 }
 
 #[parser(reader)]

@@ -11,7 +11,7 @@ const ERR_MESSAGE_RANGE: &str = "sound velocity exceeds range from 0.0 to 3276.7
 
 #[inline]
 pub fn valid(sound_velocity: f32) -> bool {
-    (MIN..MAX).contains(&sound_velocity)
+    (MIN..=MAX).contains(&sound_velocity)
 }
 
 #[parser(reader, endian)]

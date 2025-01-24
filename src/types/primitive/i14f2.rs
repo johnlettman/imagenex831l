@@ -19,7 +19,7 @@ const ERR_MESSAGE_RANGE: &str = concatcp!("Invalid i14, exceeds range from ", MI
 
 #[inline]
 pub fn valid_i14(i14: i16) -> bool {
-    (MIN..MAX).contains(&i14)
+    (MIN..=MAX).contains(&i14)
 }
 
 #[parser(reader, endian)]

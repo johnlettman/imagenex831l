@@ -7,7 +7,7 @@ const ERR_MESSAGE_RANGE: &str = "profile minimum range exceeds range from 0.0m t
 
 #[inline]
 pub fn valid(profile_min_range: f32) -> bool {
-    (MIN..MAX).contains(&profile_min_range)
+    (MIN..=MAX).contains(&profile_min_range)
 }
 
 #[parser(reader)]

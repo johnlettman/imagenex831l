@@ -165,7 +165,6 @@ mod tests {
     use super::*;
     use std::io::Cursor;
 
-    use crate::types::sensor_information;
     use log::info;
     use test_log::test;
 

@@ -54,7 +54,6 @@ pub fn write(datetime: &DateTime<Utc>) -> BinResult<()> {
 mod tests {
     use super::*;
     use std::str::from_utf8;
-    use std::time::Duration;
 
     use binrw::io::Cursor;
     use binrw::Endian;
