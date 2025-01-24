@@ -79,7 +79,7 @@ jobs:
         toolchain: nightly
     - uses: Swatinem/rust-cache@v2
     - name: Run documentation
-      run: cargo doc --workspace --all-features --no-deps --document-private-items
+      run: cargo doc --workspace --no-deps --document-private-items
 
   test:
     name: Test on ${{ matrix.os }} with Rust ${{ matrix.toolchain }}
