@@ -57,13 +57,13 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_default() {
+    fn default() {
         let got = StepDirection::default();
         assert_eq!(StepDirection::Normal, got);
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![
             (StepDirection::Normal, "normal"),
             (StepDirection::Reverse, "reverse step direction"),

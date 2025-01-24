@@ -163,3 +163,62 @@ impl HeadPosition {
         self.angle
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use log::info;
+    use test_log::test;
+
+    #[test]
+    fn default() {
+        let want = HeadPosition { angle: 0.0, direction: Direction::default() };
+        let got = HeadPosition::default();
+        assert_eq!(want, got);
+    }
+
+    #[test]
+    fn display() {
+        let cases = vec![
+            (HeadPosition { angle: 1.0, direction: Direction::Clockwise }, "1.000° clockwise"),
+            (
+                HeadPosition { angle: 3.5, direction: Direction::Counterclockwise },
+                "3.500° counterclockwise",
+            ),
+        ];
+
+        for (head_position, want) in cases {
+            info!("Displaying {head_position:?}, expecting {want:?}");
+            let got = format!("{head_position}");
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn eq() {
+        let cases = vec![
+            (
+                HeadPosition { angle: 1.5, direction: Direction::Clockwise },
+                HeadPosition { angle: 1.5, direction: Direction::Clockwise },
+                true,
+            ),
+            (
+                HeadPosition { angle: 2.5, direction: Direction::Clockwise },
+                HeadPosition { angle: 1.5, direction: Direction::Clockwise },
+                false,
+            ),
+            (
+                HeadPosition { angle: 3.55, direction: Direction::Clockwise },
+                HeadPosition { angle: 3.55, direction: Direction::Counterclockwise },
+                true,
+            ),
+        ];
+
+        for (head_position_1, head_position_2, want) in cases {
+            info!("Testing equality between {head_position_1:?} and {head_position_2:?}, want {want:?}");
+            let got = head_position_1.eq(&head_position_2);
+            assert_eq!(want, got);
+        }
+    }
+}

@@ -165,6 +165,7 @@ mod tests {
         path.push("27JUL2023-101914.31l");
 
         let mut shot_file = Reader::from_path(&path).expect("Failed to open shot file for reading");
+        #[deny(clippy::never_loop)]
         for shot in &mut shot_file {
             println!("{shot:#?}");
             break;

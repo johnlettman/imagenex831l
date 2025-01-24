@@ -79,7 +79,7 @@ mod tests {
         [(MotorCalibrate::NoCalibrate, 0), (MotorCalibrate::Calibrate, 1)];
 
     #[test]
-    fn test_from_primitive() {
+    fn from_primitive() {
         for (want, primitive) in PRIMITIVE_CASES {
             info!("From primitive {primitive:?}, want {want:?}");
             let got = MotorCalibrate::from_u8(primitive).expect("It should return a value");
@@ -88,7 +88,7 @@ mod tests {
     }
 
     #[test]
-    fn test_to_primitive() {
+    fn to_primitive() {
         for (motor_calibrate, want) in PRIMITIVE_CASES {
             info!("{motor_calibrate:?} to primitive, want {want:?}");
             let got = motor_calibrate.to_u8().expect("It should return a value");
@@ -97,13 +97,13 @@ mod tests {
     }
 
     #[test]
-    fn test_default() {
+    fn default() {
         let got = MotorCalibrate::default();
         assert_eq!(MotorCalibrate::NoCalibrate, got);
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![
             (MotorCalibrate::NoCalibrate, "normal operation"),
             (MotorCalibrate::Calibrate, "calibrate sonar head transducer"),
@@ -114,5 +114,11 @@ mod tests {
             let got = format!("{motor_calibrate}");
             assert_eq!(want, got);
         }
+    }
+
+    #[test]
+    fn from_bool() {
+        assert_eq!(MotorCalibrate::Calibrate, MotorCalibrate::from(true));
+        assert_eq!(MotorCalibrate::NoCalibrate, MotorCalibrate::from(false));
     }
 }

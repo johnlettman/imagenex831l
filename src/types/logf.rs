@@ -80,7 +80,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_decibels() {
+    fn decibels() {
         let cases = vec![
             (Logf::X10dB, 10usize),
             (Logf::X20dB, 20usize),
@@ -96,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![
             (Logf::X10dB, "10 dB"),
             (Logf::X20dB, "20 dB"),
@@ -112,7 +112,7 @@ mod tests {
     }
 
     #[test]
-    fn test_ord() {
+    fn ord() {
         let cases = vec![
             (Logf::X10dB, Logf::X10dB, Ordering::Equal),
             (Logf::X10dB, Logf::X30dB, Ordering::Less),
@@ -122,11 +122,12 @@ mod tests {
         for (a, b, want) in cases {
             info!("Comparing {a:?} and {b:?}, expecting {want:?}");
 
-            let got = a.partial_cmp(&b).expect("Should not be None");
-            assert_eq!(want, got);
-
             let got = a.cmp(&b);
             assert_eq!(want, got);
+
+            let got = a.partial_cmp(&b);
+            assert!(got.is_some());
+            assert_eq!(want, got.unwrap());
         }
     }
 }

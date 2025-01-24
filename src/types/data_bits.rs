@@ -38,9 +38,9 @@ impl DataBits {
     }
 }
 
-impl PartialOrd<Self> for DataBits {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+impl Display for DataBits {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{} bits", self.bits())
     }
 }
 
@@ -50,9 +50,9 @@ impl Ord for DataBits {
     }
 }
 
-impl Display for DataBits {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{} bits", self.bits())
+impl PartialOrd<Self> for DataBits {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -81,7 +81,18 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_display() {
+    fn bits() {
+        let cases = vec![(DataBits::X4Bits, 4), (DataBits::X8Bits, 8), (DataBits::X14Bits, 14)];
+
+        for (data_bits, want) in cases {
+            info!("Getting bits from {data_bits:?}, expecting {want:?}");
+            let got = data_bits.bits();
+            assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn display() {
         let cases = vec![
             (DataBits::X4Bits, "4 bits"),
             (DataBits::X8Bits, "8 bits"),
@@ -92,6 +103,25 @@ mod tests {
             info!("Displaying {data_bits:?}, expecting {want:?}");
             let got = format!("{data_bits}");
             assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn ord() {
+        let cases = vec![
+            (DataBits::X4Bits, DataBits::X8Bits, Ordering::Less),
+            (DataBits::X4Bits, DataBits::X4Bits, Ordering::Equal),
+            (DataBits::X14Bits, DataBits::X4Bits, Ordering::Greater),
+        ];
+
+        for (data_bits_1, data_bits_2, want) in cases {
+            info!("Ordering {data_bits_1:?} against {data_bits_2:?}, want {want:?}");
+            let got = data_bits_1.cmp(&data_bits_2);
+            assert_eq!(want, got);
+
+            let got = data_bits_1.partial_cmp(&data_bits_2);
+            assert!(got.is_some());
+            assert_eq!(want, got.unwrap());
         }
     }
 }

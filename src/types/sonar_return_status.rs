@@ -235,7 +235,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_default() {
+    fn default() {
         let want = SonarReturnStatus {
             range_error: false,
             frequency_error: false,
@@ -249,7 +249,7 @@ mod tests {
     }
 
     #[test]
-    fn test_has_error() {
+    fn has_error() {
         let mut status = SonarReturnStatus::default();
         assert!(!status.has_error());
 
@@ -322,7 +322,7 @@ mod tests {
     ];
 
     #[test]
-    fn test_parse() {
+    fn parse() {
         for &(ref want, raw) in BINARY_CASES.iter() {
             info!("Parsing {raw:?}, expecting {want:?}");
             let mut cursor = Cursor::new(vec![raw]);
@@ -333,7 +333,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn write() {
         for &(ref status, raw) in BINARY_CASES.iter() {
             info!("Writing {status:?}, expecting {raw:?}");
             let mut cursor = Cursor::new(Vec::new());

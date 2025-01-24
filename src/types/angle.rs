@@ -122,7 +122,7 @@ mod tests {
     ];
 
     #[test]
-    fn test_valid_angle() {
+    fn valid_angle() {
         let cases = vec![
             (Angle::MAX, true),
             (Angle::MIN, true),
@@ -138,7 +138,7 @@ mod tests {
     }
 
     #[test]
-    fn test_valid() {
+    fn valid() {
         let cases = vec![
             (Angle::new(Angle::MAX, true, false), true),
             (Angle::new(Angle::MIN, false, true), true),
@@ -154,7 +154,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse() {
+    fn parse() {
         for &(want, ref bytes) in BINARY_CASES.iter() {
             info!("Parsing {bytes:?}, expecting {want:?}");
             let mut cursor = Cursor::new(bytes);
@@ -165,7 +165,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn write() {
         for &(angle, ref want) in BINARY_CASES.iter() {
             info!("Writing {angle:?}, expecting {want:?}");
             let mut cursor = Cursor::new(Vec::new());

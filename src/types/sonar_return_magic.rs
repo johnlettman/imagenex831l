@@ -128,7 +128,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_data_length() {
+    fn data_length() {
         let cases = vec![(SonarReturnMagic::IMX, 250), (SonarReturnMagic::IPX, 0)];
 
         for (magic, want) in cases {
@@ -139,7 +139,7 @@ mod tests {
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![(SonarReturnMagic::IMX, "IMX"), (SonarReturnMagic::IPX, "IPX")];
 
         for (magic, want) in cases {
@@ -154,7 +154,7 @@ mod tests {
         [(SonarReturnMagic::IMX, b"IMX"), (SonarReturnMagic::IPX, b"IPX")];
 
     #[test]
-    fn test_parse() {
+    fn parse() {
         for (want, bytes) in BINARY_CASES {
             info!("Parsing {bytes:?}, want {want:?}");
             let mut cursor = Cursor::new(bytes);
@@ -165,7 +165,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_invalid() {
+    fn parse_invalid() {
         let cases = vec![b"ASD", b"QWE", b"TFD"];
 
         for bytes in cases {
@@ -177,7 +177,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn write() {
         for (magic, want) in BINARY_CASES {
             info!("Writing {magic:?}, want {want:?}");
             let mut cursor = Cursor::new(Vec::new());

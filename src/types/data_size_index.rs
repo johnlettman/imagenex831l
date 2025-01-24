@@ -1,5 +1,6 @@
 use binrw::{BinRead, BinWrite};
 use num_derive::{FromPrimitive, ToPrimitive};
+use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 
 #[cfg(feature = "pyo3")]
@@ -41,13 +42,19 @@ impl Default for DataSizeIndex {
 
 impl Display for DataSizeIndex {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                Self::X250Bytes => "250 bytes",
-            }
-        )
+        write!(f, "{} bytes", self.bytes())
+    }
+}
+
+impl Ord for DataSizeIndex {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.bytes().cmp(&other.bytes())
+    }
+}
+
+impl PartialOrd for DataSizeIndex {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.bytes().cmp(&other.bytes()))
     }
 }
 
@@ -76,7 +83,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_bytes() {
+    fn bytes() {
         let cases = vec![(DataSizeIndex::X250Bytes, 250usize)];
 
         for (data_size_index, want) in cases {
@@ -87,20 +94,35 @@ mod tests {
     }
 
     #[test]
-    fn test_default() {
+    fn default() {
         let want = DataSizeIndex::X250Bytes;
         let got = DataSizeIndex::default();
         assert_eq!(got, want, "it should default to {want:?}");
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![(DataSizeIndex::X250Bytes, "250 bytes")];
 
         for (data_size_index, want) in cases {
             info!("Displaying {data_size_index:?}, expecting {want:?}");
             let got = format!("{data_size_index}");
             assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn ord() {
+        let cases = vec![(DataSizeIndex::X250Bytes, DataSizeIndex::X250Bytes, Ordering::Equal)];
+
+        for (data_size_index_1, data_size_index_2, want) in cases {
+            info!("Ordering {data_size_index_1:?} against {data_size_index_2:?}, want {want:?}");
+            let got = data_size_index_1.cmp(&data_size_index_2);
+            assert_eq!(want, got);
+
+            let got = data_size_index_1.partial_cmp(&data_size_index_2);
+            assert!(got.is_some());
+            assert_eq!(want, got.unwrap());
         }
     }
 }

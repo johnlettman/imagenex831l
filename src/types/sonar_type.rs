@@ -53,7 +53,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases =
             vec![(SonarType::Scanning, "scanning"), (SonarType::FixedPosition, "fixed position")];
 

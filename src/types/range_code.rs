@@ -147,7 +147,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_range() {
+    fn range() {
         let cases = vec![
             (RangeCode::X0_125m, 0.125),
             (RangeCode::X0_25m, 0.250),
@@ -169,7 +169,7 @@ mod tests {
     }
 
     #[test]
-    fn test_table() {
+    fn table() {
         let cases = vec![
             (RangeCode::X0_125m, range_table::X0_125M),
             (RangeCode::X0_25m, range_table::X0_25M),
@@ -191,7 +191,7 @@ mod tests {
     }
 
     #[test]
-    fn test_filter_delay() {
+    fn filter_delay() {
         let cases = vec![
             (RangeCode::X0_125m, 0.016),
             (RangeCode::X0_25m, 0.016),
@@ -213,7 +213,7 @@ mod tests {
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![
             (RangeCode::X0_125m, "0.125 meters"),
             (RangeCode::X0_25m, "0.250 meters"),

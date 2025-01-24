@@ -189,7 +189,7 @@ mod tests {
     ];
 
     #[test]
-    fn test_parse() {
+    fn parse() {
         for (want, bytes) in BINARY_CASES {
             info!("Parsing {bytes:?}, want {want:?}");
             let mut cursor = Cursor::new(bytes);
@@ -199,7 +199,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_options() {
+    fn parse_options() {
         for (want, bytes) in BINARY_CASES {
             info!("Parsing {bytes:?}, want {want:?}");
             let mut cursor = Cursor::new(bytes);
@@ -210,7 +210,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn write() {
         for (motion_config, want) in BINARY_CASES {
             info!("Writing {motion_config:?}, want {want:?}");
             let mut cursor = Cursor::new(Vec::new());
@@ -222,7 +222,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write_options() {
+    fn write_options() {
         for (motion_config, want) in BINARY_CASES {
             info!("Writing {motion_config:?}, want {want:?}");
             let mut cursor = Cursor::new(Vec::new());

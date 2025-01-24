@@ -55,7 +55,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![(Zero::Up, "up"), (Zero::Down, "down")];
 
         for (zero, want) in cases {

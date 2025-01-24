@@ -181,7 +181,7 @@ mod tests {
     ];
 
     #[test]
-    fn test_parse() {
+    fn parse() {
         for (want, bytes) in BINARY_CASES {
             info!("Parsing {bytes:?}, want {want:?}");
             let mut cursor = Cursor::new(bytes);
@@ -192,7 +192,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn write() {
         for (config, want) in BINARY_CASES {
             info!("Writing {config:?}, want {want:?}");
             let mut cursor = Cursor::new(Vec::new());

@@ -108,7 +108,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_eq() {
+    fn eq() {
         let cases = vec![
             (Acceleration::new(6.0, true, false), Acceleration::new(6.0, true, false), true),
             (Acceleration::new(12.0, true, false), Acceleration::new(12.0, true, false), true),
@@ -123,7 +123,7 @@ mod tests {
     }
 
     #[test]
-    fn test_ord() {
+    fn ord() {
         let cases = vec![
             (
                 Acceleration::new(6.0, true, false),
@@ -151,5 +151,15 @@ mod tests {
             info!("Comparing {a:?} and {b:?}, expecting {want:?}");
             assert_eq!(a.partial_cmp(&b), want);
         }
+    }
+
+    #[test]
+    fn from_f32() {
+        assert_eq!(Acceleration::from(1.0), Acceleration::new(1.0, false, false));
+    }
+
+    #[test]
+    fn from_f64() {
+        assert_eq!(Acceleration::from(1.0), Acceleration::new(1.0, false, false));
     }
 }
