@@ -1,14 +1,17 @@
+//! Utilities for the **Absorption** primitive, the recorded loss of sound energy as the sonar waves
+//! propagate through water.
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
 pub(crate) const MIN: f32 = 0.0;
 pub(crate) const MAX: f32 = 2.55;
-const ERR_MESSAGE_RANGE: &str = "absorption exceeds range from 0.0 to 2.55 dB/m";
 
+/// Validate if the provided **Absorption** can fit in a byte.
 #[inline]
 pub fn valid(absorption: f32) -> bool {
     (MIN..=MAX).contains(&absorption)
 }
 
+/// Parse **Absorption** from a byte.
 #[parser(reader)]
 pub fn parse() -> BinResult<f32> {
     let raw = u8::read(reader)?;
@@ -16,17 +19,24 @@ pub fn parse() -> BinResult<f32> {
 
     if !valid(absorption) {
         let pos = reader.stream_position()?;
-        return Err(Error::AssertFail { pos, message: ERR_MESSAGE_RANGE.to_string() });
+        return Err(Error::AssertFail {
+            pos,
+            message: "Absorption exceeds range of 0.0 to 2.55 dB/m".to_string(),
+        });
     }
 
     Ok(absorption)
 }
 
+/// Write **Absorption** to a byte.
 #[writer(writer)]
 pub fn write(absorption: &f32) -> BinResult<()> {
     if !valid(*absorption) {
         let pos = writer.stream_position()?;
-        return Err(Error::AssertFail { pos, message: ERR_MESSAGE_RANGE.to_string() });
+        return Err(Error::AssertFail {
+            pos,
+            message: "Absorption exceeds range of 0.0 to 2.55 dB/m".to_string(),
+        });
     }
 
     let raw = (*absorption * 100.0).round() as u8;

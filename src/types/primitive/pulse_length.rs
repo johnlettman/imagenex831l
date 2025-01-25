@@ -1,3 +1,4 @@
+//! Utilities for the **Pulse Length** primitive, the length of an acoustic transmit pulse.
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 

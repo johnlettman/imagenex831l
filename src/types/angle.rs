@@ -1,6 +1,7 @@
 use crate::types::primitive::i14f2;
 use binrw::{BinRead, BinResult, BinWrite, Endian};
 use std::cmp::Ordering;
+use std::fmt::Display;
 use std::io::{Read, Seek, Write};
 
 #[cfg(feature = "pyo3")]
@@ -35,6 +36,12 @@ impl Angle {
 
     pub fn valid(&self) -> bool {
         Self::valid_angle(self.angle)
+    }
+}
+
+impl Display for Angle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}°", self.angle)
     }
 }
 

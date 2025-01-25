@@ -1,16 +1,17 @@
+//! Utilities for the **Train Angle** primitive, the orientation of direction in which the sonar
+//! transducer is pointed relative to the platform's fixed baseline.
+//! *Ignored in Fixed-transducer sonars*.
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
-use const_format::concatcp;
 
-pub(crate) const MIN: u16 = 0;
 pub(crate) const MAX: u16 = 360;
-const ERR_MESSAGE_RANGE: &str =
-    concatcp!("train angle exceeds maximum of ", MIN, "° to ", MAX, "°");
 
+/// Validate the **Train Angle** value.
 #[inline]
-pub fn valid(train_angle: u16) -> bool {
-    train_angle <= MAX
+pub fn valid(value: u16) -> bool {
+    value <= MAX
 }
 
+/// Parse the **Train Angle** from two bytes.
 #[parser(reader)]
 pub fn parse() -> BinResult<u16> {
     let raw = u8::read(reader)?;
@@ -18,17 +19,24 @@ pub fn parse() -> BinResult<u16> {
 
     if !valid(train_angle) {
         let pos = reader.stream_position()?;
-        return Err(Error::AssertFail { pos, message: ERR_MESSAGE_RANGE.to_string() });
+        return Err(Error::AssertFail {
+            pos,
+            message: "Train Angle exceeds range of 0 to 360°".to_string(),
+        });
     }
 
     Ok(train_angle)
 }
 
+/// Write the **Train Angle** to two bytes.
 #[writer(writer)]
 pub fn write(train_angle: &u16) -> BinResult<()> {
     if !valid(*train_angle) {
         let pos = writer.stream_position()?;
-        return Err(Error::AssertFail { pos, message: ERR_MESSAGE_RANGE.to_string() });
+        return Err(Error::AssertFail {
+            pos,
+            message: "Train Angle exceeds range of 0 to 360°".to_string(),
+        });
     }
 
     let raw = (*train_angle / 3) as u8;
@@ -39,7 +47,8 @@ pub fn write(train_angle: &u16) -> BinResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use binrw::{io::Cursor, Endian};
+    use crate::ENDIAN;
+    use binrw::io::Cursor;
 
     use log::info;
     use test_log::test;
@@ -55,7 +64,6 @@ mod tests {
         }
     }
 
-    const BINARY_ENDIAN: Endian = Endian::Big;
     const BINARY_CASES: [(u16, [u8; 1]); 4] = [
         (0, [0]),     // 0° (0 * 3)
         (3, [1]),     // 3° (1 * 3)
@@ -68,7 +76,7 @@ mod tests {
         for &(want, bytes) in BINARY_CASES.iter() {
             info!("Parsing {bytes:?}, want {want:?}");
             let mut cursor = Cursor::new(bytes);
-            let got = parse(&mut cursor, BINARY_ENDIAN, ()).expect("It should not return an error");
+            let got = parse(&mut cursor, ENDIAN, ()).expect("Should succeed");
             assert_eq!(want, got);
         }
     }
@@ -83,7 +91,7 @@ mod tests {
         for bytes in cases.iter() {
             info!("Parsing {bytes:?}, want error");
             let mut cursor = Cursor::new(bytes);
-            let error = parse(&mut cursor, BINARY_ENDIAN, ()).unwrap_err();
+            let error = parse(&mut cursor, ENDIAN, ()).unwrap_err();
             assert!(matches!(error, Error::AssertFail { .. }));
         }
     }
@@ -93,8 +101,7 @@ mod tests {
         for (train_angle, want) in BINARY_CASES.iter() {
             info!("Writing {train_angle:?}, want {want:?}");
             let mut cursor = Cursor::new(Vec::new());
-            write(&train_angle, &mut cursor, BINARY_ENDIAN, ())
-                .expect("It should not return an error");
+            write(&train_angle, &mut cursor, ENDIAN, ()).expect("It should not return an error");
             let inner = cursor.into_inner();
             let got = inner.as_slice();
             assert_eq!(want, got);
@@ -111,7 +118,7 @@ mod tests {
         for train_angle in cases.iter() {
             info!("Writing {train_angle:?}, want error");
             let mut cursor = Cursor::new(Vec::new());
-            let error = write(train_angle, &mut cursor, BINARY_ENDIAN, ()).unwrap_err();
+            let error = write(train_angle, &mut cursor, ENDIAN, ()).unwrap_err();
             assert!(matches!(error, Error::AssertFail { .. }));
         }
     }

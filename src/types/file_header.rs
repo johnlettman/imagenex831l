@@ -3,7 +3,7 @@ use crate::types::{
         absorption, datetime, pulse_length, real_time_prf, sector_size, sound_velocity, start_gain,
         train_angle,
     },
-    Config, DataSizeIndex, MotionConfig, RangeCode, SensorAvailable, SensorInformation,
+    Config, DataPoints, MotionConfig, RangeCode, SensorAvailable, SensorInformation,
 };
 use binrw::{BinRead, BinWrite};
 use chrono::{DateTime, Utc};
@@ -37,11 +37,11 @@ use pyo3::prelude::*;
 #[cfg_attr(feature = "pyo3", pyclass(eq))]
 pub struct FileHeader {
     #[cfg(not(feature = "pyo3"))]
-    data_size_index: DataSizeIndex,
+    data_size_index: DataPoints,
 
     #[cfg(feature = "pyo3")]
     #[pyo3(get, set)]
-    data_size_index: DataSizeIndex,
+    data_size_index: DataPoints,
 
     #[cfg(not(feature = "pyo3"))]
     total_length: u16,

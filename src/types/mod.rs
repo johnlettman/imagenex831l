@@ -33,7 +33,7 @@ pub use angle::Angle;
 pub use command::Command;
 pub use config::Config;
 pub use data_bits::DataBits;
-pub use data_size_index::DataSizeIndex;
+pub use data_size_index::DataPoints;
 pub use direction::Direction;
 pub use file_header::FileHeader;
 pub use head_position::HeadPosition;
@@ -67,7 +67,7 @@ pub(crate) fn types(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<Command>()?;
     module.add_class::<Config>()?;
     module.add_class::<DataBits>()?;
-    module.add_class::<DataSizeIndex>()?;
+    module.add_class::<DataPoints>()?;
     module.add_class::<Direction>()?;
     module.add_class::<FileHeader>()?;
     module.add_class::<HeadPosition>()?;

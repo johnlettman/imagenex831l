@@ -1,3 +1,6 @@
+//! Utilities for the **Profile Minimum Range** primitive, the minimum range for profile point digitization.
+//!
+//! The byte format is 0―250 ⇔ 0―2.5 meters in 0.001 meter increments.
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
 pub(crate) const MIN: f32 = 0.0;

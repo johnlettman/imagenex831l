@@ -1,3 +1,5 @@
+//! Utilities for the **Sound Velocity** primitive, the speed at which sound is traveling through
+//! the water.
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
 pub(crate) const MIN: f32 = 0.0;
@@ -7,30 +9,34 @@ pub(crate) const V_VALUE: f32 = 1500.0;
 const MASK: u16 = 0b0111_1111_1111_1111;
 const MASK_V: u16 = 0b1000_0000_0000_0000;
 
-const ERR_MESSAGE_RANGE: &str = "sound velocity exceeds range from 0.0 to 3276.7 m/s";
-
+/// Validate if the provided **Sound Velocity** can fit in two bytes.
 #[inline]
 pub fn valid(sound_velocity: f32) -> bool {
     (MIN..=MAX).contains(&sound_velocity)
 }
 
+/// Parse **Sound Velocity** from two bytes.
 #[parser(reader, endian)]
 pub fn parse() -> BinResult<f32> {
     let raw = u16::read_options(reader, endian, ())?;
 
     if (raw & MASK_V) != 0 {
-        return Ok(1500.0);
+        return Ok(V_VALUE);
     }
 
     let sound_velocity = (raw & MASK) as f32 / 10.0;
     Ok(sound_velocity)
 }
 
+/// Write **Sound Velocity** to two bytes.
 #[writer(writer, endian)]
 pub fn write(sound_velocity: &f32) -> BinResult<()> {
     if !valid(*sound_velocity) {
         let pos = writer.stream_position()?;
-        return Err(Error::AssertFail { pos, message: ERR_MESSAGE_RANGE.to_string() });
+        return Err(Error::AssertFail {
+            pos,
+            message: "Sound Velocity exceeds range of 0.0 to 3,276.7 m/s".to_string(),
+        });
     }
 
     if *sound_velocity == V_VALUE {

@@ -1,3 +1,4 @@
+//! Utilities for the **Sector Size** primitive. *Ignored in Fixed-transducer sonars*.
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 

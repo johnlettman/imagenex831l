@@ -1,6 +1,8 @@
+//! Utilities for the string primitive, a null-terminated C string.
 use binrw::{parser, writer, BinResult, Error};
 use std::str::from_utf8;
 
+/// Parse a null-terminated C string from a sequence of bytes.
 #[parser(reader)]
 pub fn parse(length: usize) -> BinResult<(String, u64)> {
     let mut buffer = vec![0u8; length];
@@ -15,6 +17,7 @@ pub fn parse(length: usize) -> BinResult<(String, u64)> {
     Ok((string, pos))
 }
 
+/// Write a null-terminated C string to a sequence of bytes.
 #[writer(writer)]
 pub fn write(data: String, length: usize) -> BinResult<()> {
     let mut buffer = vec![0u8; length];
@@ -29,13 +32,12 @@ pub fn write(data: String, length: usize) -> BinResult<()> {
 mod tests {
     use super::*;
 
-    use binrw::Endian;
+    use crate::ENDIAN;
     use log::info;
     use std::io::Cursor;
     use test_log::test;
 
-    const BINARY_ENDIAN: Endian = Endian::NATIVE;
-    const BINARY_CASES: [(&[u8], usize, &'static str); 3] = [
+    const BINARY_CASES: [(&[u8], usize, &str); 3] = [
         (b"HELLO WORLD\0", 12, "HELLO WORLD"),
         (b"ASDF\0", 5, "ASDF"),
         (b"how do you do?\0", 15, "how do you do?"),
@@ -47,8 +49,8 @@ mod tests {
             info!("Parsing {bytes:?} with length {length}, expecting {want:?}");
             let mut cursor = Cursor::new(bytes);
 
-            let (got, _) = parse(&mut cursor, BINARY_ENDIAN, (length,))
-                .expect("It should not return an error");
+            let (got, _) =
+                parse(&mut cursor, ENDIAN, (length,)).expect("It should not return an error");
 
             assert_eq!(want, got);
         }
@@ -60,7 +62,7 @@ mod tests {
             info!("Writing {string:?} with length {length}, expecting {want:?}");
             let mut cursor = Cursor::new(Vec::new());
 
-            write(string.to_string(), &mut cursor, BINARY_ENDIAN, (length,))
+            write(string.to_string(), &mut cursor, ENDIAN, (length,))
                 .expect("It should not return an error");
 
             let got_inner = cursor.into_inner();
