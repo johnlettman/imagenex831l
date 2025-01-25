@@ -1,3 +1,26 @@
+//! Utilities for the `u14` primitive, an unsigned 14-bit integer.
+//!
+//! This primitive is used for **Profile Range** and **Data Bytes**.
+//!
+//! ## Wire format
+//!
+//! <table>
+//! <tr>
+//! <th colspan="8">Low Byte</th>
+//! <th colspan="8">High Byte</th>
+//! </tr>
+//! <tr>
+//!     <td><code>7</code></td><td><code>6</code></td><td><code>5</code></td><td><code>4</code></td>
+//!     <td><code>3</code></td><td><code>2</code></td><td><code>1</code></td><td><code>0</code></td>
+//!     <td><code>7</code></td><td><code>6</code></td><td><code>5</code></td><td><code>4</code></td>
+//!     <td><code>3</code></td><td><code>2</code></td><td><code>1</code></td><td><code>0</code></td>
+//! </tr>
+//! <tr>
+//!     <td><em>0</em></td><td colspan="7"><em>u14 LOW</em></td>
+//!     <td><em>0</em></td><td colspan="6"><em>u14 HIGH</em></td>
+//!     <td><em>u14 LOW BIT 0</em></td>
+//! </tr>
+//! </table>
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 use std::io::{Error as IOError, ErrorKind::InvalidData};
@@ -12,13 +35,15 @@ const SHIFT_HIGH_L: usize = 7;
 
 const MASK_LOW: u8 = 0b0111_1111;
 
-const ERR_MESSAGE_RANGE: &'static str = concatcp!("u14 exceeds maximum of ", MAX);
+const ERR_MESSAGE_RANGE: &str = concatcp!("u14 exceeds maximum of ", MAX);
 
+/// Validate if the provided value can fit in a `u14`.
 #[inline]
-pub fn valid(u14: u16) -> bool {
-    u14 <= MAX
+pub fn valid(value: u16) -> bool {
+    value <= MAX
 }
 
+/// Parse an 831L-formatted `u14` from two bytes.
 #[parser(reader, endian)]
 pub fn parse() -> BinResult<u16> {
     let raw = u16::read_options(reader, endian, ())?;
@@ -34,6 +59,7 @@ pub fn parse() -> BinResult<u16> {
     Ok(value)
 }
 
+/// Write an 831L-formatted `u14` to two bytes.
 #[writer(writer, endian)]
 pub fn write(u14: &u16) -> BinResult<()> {
     if !valid(*u14) {

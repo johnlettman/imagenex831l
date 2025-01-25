@@ -57,14 +57,14 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_default() {
+    fn default() {
         let want = Direction::Counterclockwise;
         let got = Direction::default();
         assert_eq!(want, got);
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![
             (Direction::Clockwise, "clockwise"),
             (Direction::Counterclockwise, "counterclockwise"),

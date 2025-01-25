@@ -1,13 +1,16 @@
+//! Utilities for the **Profile Minimum Range** primitive, the minimum range for profile point digitization.
+//!
+//! The byte format is 0―250 ⇔ 0―2.5 meters in 0.001 meter increments.
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
 pub(crate) const MIN: f32 = 0.0;
 pub(crate) const MAX: f32 = 250.0;
 
-const ERR_MESSAGE_RANGE: &'static str = "profile minimum range exceeds range from 0.0m to 250.0m";
+const ERR_MESSAGE_RANGE: &str = "profile minimum range exceeds range from 0.0m to 250.0m";
 
 #[inline]
 pub fn valid(profile_min_range: f32) -> bool {
-    MIN <= profile_min_range && profile_min_range <= MAX
+    (MIN..=MAX).contains(&profile_min_range)
 }
 
 #[parser(reader)]

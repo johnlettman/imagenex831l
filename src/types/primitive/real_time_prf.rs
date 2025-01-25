@@ -1,3 +1,5 @@
+//! Utilities for the **Real-Time PRF**/**Real-Time Repetition Rate** primitive,
+//! the rate at which sonar transmits pulses into the water measured in Hz.
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
 pub(crate) const MIN: f32 = 0.0;
@@ -5,12 +7,12 @@ pub(crate) const MAX: f32 = 327.67;
 
 const MASK: u16 = 0b0111_1111_1111_1111;
 
-const ERR_MESSAGE_RANGE: &'static str = "real-time pRF exceeds range of 0.0 to 327.67 Hz";
-
+/// Validate if the provided **Real-Time PRF** can fit in two bytes.
 pub fn valid(real_time_prf: f32) -> bool {
-    MIN <= real_time_prf && real_time_prf <= MAX
+    (MIN..=MAX).contains(&real_time_prf)
 }
 
+/// Parse a **Real-Time PRF** from two bytes.
 #[parser(reader, endian)]
 pub fn parse() -> BinResult<f32> {
     let raw = u16::read_options(reader, endian, ())?;
@@ -18,11 +20,15 @@ pub fn parse() -> BinResult<f32> {
     Ok(real_time_prf)
 }
 
+/// Write a **Real-Time PRF** to two bytes.
 #[writer(writer, endian)]
 pub fn write(real_time_prf: &f32) -> BinResult<()> {
     if !valid(*real_time_prf) {
         let pos = writer.stream_position()?;
-        return Err(Error::AssertFail { pos, message: ERR_MESSAGE_RANGE.to_string() });
+        return Err(Error::AssertFail {
+            pos,
+            message: "Real-Time PRF exceeds range of 0.0 to 327.67 Hz".to_string(),
+        });
     }
 
     let raw = (*real_time_prf * 100.0).round() as u16 & MASK;

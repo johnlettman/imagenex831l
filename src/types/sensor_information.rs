@@ -165,12 +165,11 @@ mod tests {
     use super::*;
     use std::io::Cursor;
 
-    use crate::types::sensor_information;
     use log::info;
     use test_log::test;
 
     #[test]
-    fn test_fmt_valid() {
+    fn fmt_valid() {
         let cases = vec![(true, "valid"), (false, "invalid")];
 
         for (validity, want) in cases {
@@ -181,7 +180,7 @@ mod tests {
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![
             (
                 SensorInformation { pitch_valid: true, roll_valid: true, distance_valid: true },
@@ -233,7 +232,7 @@ mod tests {
     ];
 
     #[test]
-    fn test_parse() {
+    fn parse() {
         for (want, bytes) in BINARY_CASES {
             info!("Parsing {bytes:?}, want {want:?}");
             let mut cursor = Cursor::new(bytes);
@@ -243,7 +242,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_options() {
+    fn parse_options() {
         for (want, bytes) in BINARY_CASES {
             info!("Parsing {bytes:?}, want {want:?}");
             let mut cursor = Cursor::new(bytes);
@@ -254,7 +253,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn write() {
         for (sensor_information, want) in BINARY_CASES {
             info!("Writing {sensor_information:?}, want {want:?}");
             let mut cursor = Cursor::new(Vec::new());
@@ -266,7 +265,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write_options() {
+    fn write_options() {
         for (sensor_information, want) in BINARY_CASES {
             info!("Writing {sensor_information:?}, want {want:?}");
             let mut cursor = Cursor::new(Vec::new());

@@ -20,7 +20,7 @@ name = "imagenex831l"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-nightly = ["dep:backtrace"]
+nightly = ["dep:backtrace", "binrw/verbose-backtrace"]
 pyo3 = ["dep:pyo3", "dep:pyo3-file", "dep:pyo3-log"]
 serde = ["dep:serde", "chrono/serde"]
 syslog = ["dep:slog-syslog"]

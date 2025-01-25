@@ -6,7 +6,7 @@ use std::io::{Read, Seek, Write};
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-#[derive(Debug, Eq, PartialEq, Clone, derive_new::new)]
+#[derive(Debug, Default, Eq, PartialEq, Clone, derive_new::new)]
 #[cfg_attr(
     target_family = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize),
@@ -66,18 +66,6 @@ impl SonarReturnStatus {
             || self.frequency_error
             || self.internal_sensor_error
             || self.calibration_error
-    }
-}
-
-impl Default for SonarReturnStatus {
-    fn default() -> Self {
-        Self {
-            range_error: false,
-            frequency_error: false,
-            internal_sensor_error: false,
-            calibration_error: false,
-            switches_accepted: false,
-        }
     }
 }
 
@@ -247,7 +235,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_default() {
+    fn default() {
         let want = SonarReturnStatus {
             range_error: false,
             frequency_error: false,
@@ -261,7 +249,7 @@ mod tests {
     }
 
     #[test]
-    fn test_has_error() {
+    fn has_error() {
         let mut status = SonarReturnStatus::default();
         assert!(!status.has_error());
 
@@ -334,7 +322,7 @@ mod tests {
     ];
 
     #[test]
-    fn test_parse() {
+    fn parse() {
         for &(ref want, raw) in BINARY_CASES.iter() {
             info!("Parsing {raw:?}, expecting {want:?}");
             let mut cursor = Cursor::new(vec![raw]);
@@ -345,7 +333,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn write() {
         for &(ref status, raw) in BINARY_CASES.iter() {
             info!("Writing {status:?}, expecting {raw:?}");
             let mut cursor = Cursor::new(Vec::new());

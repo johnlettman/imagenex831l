@@ -5,9 +5,6 @@ use slog::{o, Drain, Duplicate, Logger};
 #[cfg(not(feature = "pyo3"))]
 use slog_async::Async;
 
-#[cfg(not(feature = "pyo3"))]
-use slog_scope::GlobalLoggerGuard;
-
 #[cfg(feature = "pyo3")]
 use once_cell::sync::Lazy;
 

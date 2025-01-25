@@ -1,3 +1,4 @@
+//! Utility modules for simple and primitive type conversions.
 pub mod absorption;
 pub mod datetime;
 pub mod frequency;
@@ -9,6 +10,6 @@ pub mod real_time_prf;
 pub mod sector_size;
 pub mod sound_velocity;
 pub mod start_gain;
-mod string;
+pub mod string;
 pub mod train_angle;
 pub mod u14;

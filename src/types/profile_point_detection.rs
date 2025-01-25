@@ -43,3 +43,25 @@ impl ProfilePointDetection {
         self.to_string()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use log::info;
+    use test_log::test;
+
+    #[test]
+    fn display() {
+        let cases = vec![
+            (ProfilePointDetection::CenterOfPulse, "center of pulse"),
+            (ProfilePointDetection::StartOfPulse, "start of pulse"),
+        ];
+
+        for (ppd, want) in cases {
+            info!("Displaying {ppd:?}, want {want}");
+            let got = format!("{ppd}");
+            assert_eq!(want, got);
+        }
+    }
+}

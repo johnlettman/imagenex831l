@@ -1,3 +1,8 @@
+//! Utilities for the **Frequency** primitive, a representation of the sonar frequency.
+//!
+//! ## Wire format
+//! - [SonarType.Scanning]: 2.15 MHz to 2.35 MHz in 5 kHz increments, and
+//! - [SonarType.FixedPosition]: 900 kHz to 1.10 MHz in 5 kHz increments.
 use crate::types::SonarType;
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 
@@ -7,8 +12,9 @@ pub(crate) const MAX_SCANNING: f32 = 2.35;
 pub(crate) const MIN_FIXED_POSITION: f32 = 0.9;
 pub(crate) const MAX_FIXED_POSITION: f32 = 1.1;
 
-const ERR_MESSAGE_RANGE: &'static str = "frequency exceeds range";
+const ERR_MESSAGE_RANGE: &str = "frequency exceeds range";
 
+/// Obtain the center **Frequency** offset for the specified [SonarType].
 fn offset_for(sonar_type: SonarType) -> f32 {
     match sonar_type {
         SonarType::Scanning => 2250.0,
@@ -16,15 +22,15 @@ fn offset_for(sonar_type: SonarType) -> f32 {
     }
 }
 
+/// Validate the **Frequency** for the specified [SonarType].
 pub fn valid_for(sonar_type: SonarType, frequency: f32) -> bool {
     match sonar_type {
-        SonarType::Scanning => MIN_SCANNING <= frequency && frequency <= MAX_SCANNING,
-        SonarType::FixedPosition => {
-            MIN_FIXED_POSITION <= frequency && frequency <= MAX_FIXED_POSITION
-        },
+        SonarType::Scanning => (MIN_SCANNING..=MAX_SCANNING).contains(&frequency),
+        SonarType::FixedPosition => (MIN_FIXED_POSITION..=MAX_FIXED_POSITION).contains(&frequency),
     }
 }
 
+/// Parse the **Frequency** for the specified [SonarType] from a byte.
 #[parser(reader)]
 pub fn parse(sonar_type: SonarType) -> BinResult<f32> {
     let raw = u8::read(reader)?;
@@ -38,6 +44,7 @@ pub fn parse(sonar_type: SonarType) -> BinResult<f32> {
     Ok(frequency)
 }
 
+/// Write the **Frequency** for the specified [SonarType] to a byte.
 #[writer(writer)]
 pub fn write(frequency: &f32, sonar_type: SonarType) -> BinResult<()> {
     if !valid_for(sonar_type, *frequency) {
@@ -53,8 +60,6 @@ pub fn write(frequency: &f32, sonar_type: SonarType) -> BinResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use binrw::Endian;
-    use std::io::Cursor;
 
     use log::info;
     use test_log::test;

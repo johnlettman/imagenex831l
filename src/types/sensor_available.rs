@@ -51,12 +51,6 @@ impl From<bool> for SensorAvailable {
     }
 }
 
-impl Into<bool> for SensorAvailable {
-    fn into(self) -> bool {
-        self == SensorAvailable::Available
-    }
-}
-
 #[cfg(feature = "pyo3")]
 #[pymethods]
 impl SensorAvailable {
@@ -79,13 +73,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_default() {
+    fn default() {
         let got = SensorAvailable::default();
         assert_eq!(got, SensorAvailable::NotAvailable);
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![
             (SensorAvailable::NotAvailable, "no external pitch / roll / distance sensor present"),
             (SensorAvailable::Available, "external pitch / roll / distance sensor present"),
@@ -95,5 +89,11 @@ mod tests {
             let got = format!("{sensor_available}");
             assert_eq!(got, want);
         }
+    }
+
+    #[test]
+    fn from_bool() {
+        assert_eq!(SensorAvailable::Available, SensorAvailable::from(true));
+        assert_eq!(SensorAvailable::NotAvailable, SensorAvailable::from(false));
     }
 }

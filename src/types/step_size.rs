@@ -73,7 +73,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_degrees() {
+    fn degrees() {
         let cases = vec![
             (StepSize::Slow, 0.3),
             (StepSize::Medium, 0.6),
@@ -90,7 +90,7 @@ mod tests {
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![
             (StepSize::Slow, "slow"),
             (StepSize::Medium, "medium"),

@@ -4,9 +4,8 @@ use binrw::BinRead;
 use pyo3::{exceptions::PyIOError, intern, prelude::*, types::PyString};
 #[cfg(feature = "pyo3")]
 use pyo3_file::PyFileLikeObject;
-use std::fs::File;
 use std::io::{Cursor, Read, Seek, SeekFrom};
-#[cfg(unix)]
+#[cfg(all(unix, not(target_family = "wasm"), feature = "pyo3"))]
 use std::os::fd::{AsRawFd, FromRawFd};
 use std::path::Path;
 use std::{fs, slice};
@@ -166,6 +165,7 @@ mod tests {
         path.push("27JUL2023-101914.31l");
 
         let mut shot_file = Reader::from_path(&path).expect("Failed to open shot file for reading");
+        #[deny(clippy::never_loop)]
         for shot in &mut shot_file {
             println!("{shot:#?}");
             break;

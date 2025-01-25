@@ -1,12 +1,12 @@
 use binrw::{BinRead, BinWrite};
 use num_derive::{FromPrimitive, ToPrimitive};
+use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-/// Size index of the sonar data field.
-/// The IMAGENEX documentation refers to this as `nToReadIndex`.
+/// The number of points in the sonar data field.
 #[derive(Debug, BinRead, BinWrite, Eq, PartialEq, Copy, Clone, ToPrimitive, FromPrimitive)]
 #[repr(u8)]
 #[brw(repr = u8)]
@@ -20,51 +20,59 @@ use pyo3::prelude::*;
     derive(serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "pyo3", pyclass(eq))]
-pub enum DataSizeIndex {
-    #[cfg_attr(feature = "serde", serde(rename = "250_bytes"))]
-    X250Bytes = 2,
+pub enum DataPoints {
+    /// 250 data points will be returned by the head.
+    /// The data will contain the `IMX` header.
+    #[cfg_attr(feature = "serde", serde(rename = "250_points"))]
+    X250Points = 2,
 }
 
-impl DataSizeIndex {
-    pub const fn bytes(&self) -> usize {
+impl DataPoints {
+    pub const fn points(&self) -> usize {
         match *self {
-            Self::X250Bytes => 250,
+            Self::X250Points => 250,
         }
     }
 }
 
-impl Default for DataSizeIndex {
+impl Default for DataPoints {
     fn default() -> Self {
-        Self::X250Bytes
+        Self::X250Points
     }
 }
 
-impl Display for DataSizeIndex {
+impl Display for DataPoints {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                Self::X250Bytes => "250 bytes",
-            }
-        )
+        write!(f, "{} points", self.points())
+    }
+}
+
+impl Ord for DataPoints {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.points().cmp(&other.points())
+    }
+}
+
+impl PartialOrd for DataPoints {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.points().cmp(&other.points()))
     }
 }
 
 #[cfg(feature = "pyo3")]
 #[pymethods]
-impl DataSizeIndex {
+impl DataPoints {
     pub(crate) fn __str__(&self) -> String {
         self.to_string()
     }
 
     pub(crate) fn __int__(&self) -> usize {
-        self.bytes()
+        self.points()
     }
 
-    #[pyo3(name = "bytes")]
-    pub(crate) fn py_bytes(&self) -> usize {
-        self.bytes()
+    #[pyo3(name = "points")]
+    pub(crate) fn py_points(&self) -> usize {
+        self.points()
     }
 }
 
@@ -76,31 +84,46 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_bytes() {
-        let cases = vec![(DataSizeIndex::X250Bytes, 250usize)];
+    fn points() {
+        let cases = vec![(DataPoints::X250Points, 250usize)];
 
         for (data_size_index, want) in cases {
-            info!("Getting bytes for {data_size_index:?}, expecting {want}");
-            let got = data_size_index.bytes();
+            info!("Getting number of points for {data_size_index:?}, expecting {want}");
+            let got = data_size_index.points();
             assert_eq!(want, got);
         }
     }
 
     #[test]
-    fn test_default() {
-        let want = DataSizeIndex::X250Bytes;
-        let got = DataSizeIndex::default();
+    fn default() {
+        let want = DataPoints::X250Points;
+        let got = DataPoints::default();
         assert_eq!(got, want, "it should default to {want:?}");
     }
 
     #[test]
-    fn test_display() {
-        let cases = vec![(DataSizeIndex::X250Bytes, "250 bytes")];
+    fn display() {
+        let cases = vec![(DataPoints::X250Points, "250 points")];
 
         for (data_size_index, want) in cases {
             info!("Displaying {data_size_index:?}, expecting {want:?}");
             let got = format!("{data_size_index}");
             assert_eq!(want, got);
+        }
+    }
+
+    #[test]
+    fn ord() {
+        let cases = vec![(DataPoints::X250Points, DataPoints::X250Points, Ordering::Equal)];
+
+        for (data_size_index_1, data_size_index_2, want) in cases {
+            info!("Ordering {data_size_index_1:?} against {data_size_index_2:?}, want {want:?}");
+            let got = data_size_index_1.cmp(&data_size_index_2);
+            assert_eq!(want, got);
+
+            let got = data_size_index_1.partial_cmp(&data_size_index_2);
+            assert!(got.is_some());
+            assert_eq!(want, got.unwrap());
         }
     }
 }

@@ -1,3 +1,5 @@
+#![allow(clippy::approx_constant)] // mistakenly identifies 3.14, etc. as PI
+
 pub type RangeTable = [f32; 250];
 
 // Range: 0.125m

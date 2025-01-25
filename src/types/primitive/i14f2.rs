@@ -1,3 +1,26 @@
+//! Utilities for the `i14f2` primitive, a signed 14-bit integer with two flags.
+//!
+//! This primitive is used for **Roll Angle**, **Pitch Angle**, **Roll Acceleration**.
+//!
+//! ## Wire format
+//!
+//! <table>
+//! <tr>
+//! <th colspan="8">Low Byte</th>
+//! <th colspan="8">High Byte</th>
+//! </tr>
+//! <tr>
+//!     <td><code>7</code></td><td><code>6</code></td><td><code>5</code></td><td><code>4</code></td>
+//!     <td><code>3</code></td><td><code>2</code></td><td><code>1</code></td><td><code>0</code></td>
+//!     <td><code>7</code></td><td><code>6</code></td><td><code>5</code></td><td><code>4</code></td>
+//!     <td><code>3</code></td><td><code>2</code></td><td><code>1</code></td><td><code>0</code></td>
+//! </tr>
+//! <tr>
+//!     <td colspan="8"><em>i14 LOW</em></td>
+//!     <td><em>f1</em></td><td><em>f2</em></td><td colspan="6"><em>i14 HIGH</em></td>
+//! </tr>
+//! </table>
+
 use binrw::{parser, writer, BinRead, BinResult, BinWrite, Error};
 use const_format::concatcp;
 use std::io::{Error as IOError, ErrorKind::InvalidData};
@@ -15,13 +38,15 @@ const MASK_I14_LOW: u8 = 0b1111_1111;
 const SIGN_I14: u16 = 0b0010_0000_0000_0000;
 const SIGN_I16_FILL: u16 = 0b1100_0000_0000_0000;
 
-const ERR_MESSAGE_RANGE: &'static str =
-    concatcp!("Invalid i14, exceeds range from ", MIN, " to ", MAX);
+const ERR_MESSAGE_RANGE: &str = concatcp!("Invalid i14, exceeds range from ", MIN, " to ", MAX);
 
+/// Validate if the provided value can fit in an `i14`.
+#[inline]
 pub fn valid_i14(i14: i16) -> bool {
-    MIN <= i14 && i14 <= MAX
+    (MIN..=MAX).contains(&i14)
 }
 
+/// Parse an 831L-formatted `i14` with two flags (`i14f2`) from two bytes.
 #[parser(reader, endian)]
 pub fn parse() -> BinResult<(i16, bool, bool)> {
     let raw = u16::read_options(reader, endian, ())?;
@@ -55,6 +80,7 @@ pub fn parse() -> BinResult<(i16, bool, bool)> {
     Ok((i14, flag1, flag2))
 }
 
+/// Write an 831L-formatted `i14` with two flags (`i14f2`) to two bytes.
 #[writer(writer, endian)]
 pub fn write(values: &(i16, bool, bool)) -> BinResult<()> {
     let (i14, flag1, flag2) = *values;
@@ -83,13 +109,13 @@ pub fn write(values: &(i16, bool, bool)) -> BinResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ENDIAN;
 
     use binrw::Endian;
     use log::info;
     use std::io::Cursor;
     use test_log::test;
 
-    const BINARY_ENDIAN: Endian = Endian::Big;
     const BINARY_CASES: [(i16, bool, bool, [u8; 2]); 9] = [
         (0, false, false, [0x00, 0x00]),
         (1, false, false, [0b0000_0001, 0b0000_0000]),
@@ -128,7 +154,7 @@ mod tests {
 
             info!("Parsing {bytes:?}, expecting {want:?}");
             let mut cursor = Cursor::new(bytes);
-            let got = parse(&mut cursor, BINARY_ENDIAN, ()).expect("Should not return an error");
+            let got = parse(&mut cursor, ENDIAN, ()).expect("Should succeed");
 
             assert_eq!(want, got);
         }
@@ -141,8 +167,7 @@ mod tests {
 
             info!("Writing {values:?}, expecting {want:?}");
             let mut cursor = Cursor::new(Vec::new());
-            write(&(i14, flag1, flag2), &mut cursor, BINARY_ENDIAN, ())
-                .expect("Should not return an error");
+            write(&(i14, flag1, flag2), &mut cursor, ENDIAN, ()).expect("Should succeed");
 
             let got_inner = cursor.into_inner();
             let got = got_inner.as_slice();
@@ -156,7 +181,7 @@ mod tests {
         let values = (invalid_i14, true, false);
 
         let mut cursor = Cursor::new(Vec::new());
-        let got = write(&values, &mut cursor, BINARY_ENDIAN, ());
+        let got = write(&values, &mut cursor, ENDIAN, ());
         assert!(got.is_err());
     }
 }

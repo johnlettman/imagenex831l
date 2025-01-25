@@ -1,9 +1,21 @@
-name: Continuous Integration
+name: 'CI: Rust'
 
 on:
   pull_request:
+    branches: [main]
+    paths:
+    - '**.rs'
+    - Cargo.toml
+    - Cargo.toml
+    - rustfmt.toml
   push:
     branches: [main]
+    paths:
+    - '**.rs'
+    - Cargo.toml
+    - Cargo.toml
+    - rustfmt.toml
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,24 +29,13 @@ env:
 jobs:
   ci:
     name: CI
-    needs: [shellcheck, fmt, check, docs, test, coverage]
+    needs: [fmt, check, docs, test, coverage]
     runs-on: ubuntu-latest
     if: always()
     steps:
     - name: Failed
       run: exit 1
       if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
-
-  shellcheck:
-    name: Check shell scripts
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Install shellcheck
-      run: sudo apt install -y shellcheck
-    - name: Run shellcheck
-      run: shellcheck ./scripts/*
 
   fmt:
     name: Check formatting
@@ -69,6 +70,7 @@ jobs:
 
   docs:
     name: Check documentation
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout

@@ -52,7 +52,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases =
             vec![(Mode::Sector, "sector"), (Mode::Polar, "polar"), (Mode::Sidescan, "sidescan")];
 

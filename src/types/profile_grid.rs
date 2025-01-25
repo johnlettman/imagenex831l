@@ -49,12 +49,6 @@ impl From<bool> for ProfileGrid {
     }
 }
 
-impl Into<bool> for ProfileGrid {
-    fn into(self) -> bool {
-        self == Self::On
-    }
-}
-
 #[cfg(feature = "pyo3")]
 #[pymethods]
 impl ProfileGrid {
@@ -80,14 +74,14 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_default() {
+    fn default() {
         let want = ProfileGrid::Off;
         let got = ProfileGrid::default();
         assert_eq!(want, got);
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![(ProfileGrid::Off, "off"), (ProfileGrid::On, "on")];
 
         for (profile_grid, want) in cases {
@@ -95,5 +89,11 @@ mod tests {
             let got = format!("{profile_grid}");
             assert_eq!(want, got);
         }
+    }
+
+    #[test]
+    fn from_bool() {
+        assert_eq!(ProfileGrid::from(true), ProfileGrid::On);
+        assert_eq!(ProfileGrid::from(false), ProfileGrid::Off);
     }
 }

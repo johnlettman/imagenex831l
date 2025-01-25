@@ -1,7 +1,11 @@
+//! Utilities for the **Profile Range** primitive, the first digitized range value above the
+//! threshold in sample numbers.
+//!
+//! Profile Range (meters) = (Profile Range (u14) * Scale (0.0005)) + Filter Delay.
 use crate::types::{primitive::u14, RangeCode};
 use binrw::{parser, writer, BinResult};
 
-pub(crate) const SCALE: f32 = 0.0005;
+const SCALE: f32 = 0.0005;
 
 #[parser(reader, endian)]
 pub fn parse(range_index: RangeCode) -> BinResult<f32> {

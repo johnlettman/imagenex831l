@@ -51,7 +51,7 @@ mod tests {
     use test_log::test;
 
     #[test]
-    fn test_display() {
+    fn display() {
         let cases = vec![(Transducer::Down, "down"), (Transducer::Up, "up")];
 
         for (transducer, want) in cases {

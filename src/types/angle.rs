@@ -1,6 +1,7 @@
 use crate::types::primitive::i14f2;
 use binrw::{BinRead, BinResult, BinWrite, Endian};
 use std::cmp::Ordering;
+use std::fmt::Display;
 use std::io::{Read, Seek, Write};
 
 #[cfg(feature = "pyo3")]
@@ -25,15 +26,22 @@ pub struct Angle {
 
 impl Angle {
     const SCALE: f32 = 0.025;
-    const MAX: f32 = i14f2::MAX as f32 * Self::SCALE;
-    const MIN: f32 = i14f2::MIN as f32 * Self::SCALE;
+    pub(crate) const MAX: f32 = i14f2::MAX as f32 * Self::SCALE;
+    pub(crate) const MIN: f32 = i14f2::MIN as f32 * Self::SCALE;
 
+    #[inline]
     pub fn valid_angle(angle: f32) -> bool {
-        Self::MIN <= angle && angle <= Self::MAX
+        (Self::MIN..=Self::MAX).contains(&angle)
     }
 
     pub fn valid(&self) -> bool {
         Self::valid_angle(self.angle)
+    }
+}
+
+impl Display for Angle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}°", self.angle)
     }
 }
 
@@ -121,7 +129,7 @@ mod tests {
     ];
 
     #[test]
-    fn test_valid_angle() {
+    fn valid_angle() {
         let cases = vec![
             (Angle::MAX, true),
             (Angle::MIN, true),
@@ -137,7 +145,7 @@ mod tests {
     }
 
     #[test]
-    fn test_valid() {
+    fn valid() {
         let cases = vec![
             (Angle::new(Angle::MAX, true, false), true),
             (Angle::new(Angle::MIN, false, true), true),
@@ -153,7 +161,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse() {
+    fn parse() {
         for &(want, ref bytes) in BINARY_CASES.iter() {
             info!("Parsing {bytes:?}, expecting {want:?}");
             let mut cursor = Cursor::new(bytes);
@@ -164,7 +172,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn write() {
         for &(angle, ref want) in BINARY_CASES.iter() {
             info!("Writing {angle:?}, expecting {want:?}");
             let mut cursor = Cursor::new(Vec::new());

@@ -13,6 +13,7 @@ mod io;
 pub(crate) mod logger;
 pub mod types;
 
+use binrw::Endian;
 pub use io::Reader;
 pub use shot::Shot;
 pub use sonar_return::SonarReturn;
@@ -23,6 +24,11 @@ pub use error::Error;
 
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
+
+pub type Result<T> = core::result::Result<T, Error>;
+
+/// The endianness of all IMAGENEX 831L messages.
+pub const ENDIAN: Endian = Endian::Big;
 
 #[cfg(feature = "pyo3")]
 #[pymodule(name = "imagenex831l")]
@@ -49,5 +55,3 @@ pub fn set_panic_hook() {
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
 }
-
-pub type Result<T> = core::result::Result<T, Error>;
