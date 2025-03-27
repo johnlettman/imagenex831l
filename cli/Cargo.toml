@@ -13,7 +13,7 @@ csv-output = []
 [dependencies]
 human-panic = "2.0.1"
 better-panic = "0.3.0"
-clap = { version = "4.5.32", features = ["derive"] }
+clap = { version = "4.5.34", features = ["derive"] }
 clap_complete = "4.5.47"
 
 [dependencies.imagenex831l]
