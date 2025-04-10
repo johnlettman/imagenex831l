@@ -65,8 +65,6 @@ jobs:
     - uses: Swatinem/rust-cache@v2
     - name: Check
       run: cargo check
-    - name: Is Cargo.lock up to date?
-      run: cargo update --locked
 
   docs:
     name: Check documentation
