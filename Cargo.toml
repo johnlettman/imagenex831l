@@ -50,7 +50,7 @@ project-root = "0.2"
 pyo3 = { version = "0.24", features = ["extension-module", "chrono"], optional = true }
 pyo3-file = { version = "0.12", optional = true }
 pyo3-log = { version = "0.12.3", optional = true }
-backtrace = { version = "0.3.73", optional = true }
+backtrace = { version = "0.3.75", optional = true }
 slog = "2.7.0"
 slog-scope = "4.4.0"
 slog-stdlog = "4.1.1"
