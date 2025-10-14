@@ -14,7 +14,7 @@ csv-output = []
 human-panic = "2.0.3"
 better-panic = "0.3.0"
 clap = { version = "4.5.49", features = ["derive"] }
-clap_complete = "4.5.57"
+clap_complete = "4.5.59"
 
 [dependencies.imagenex831l]
 path = "../"
