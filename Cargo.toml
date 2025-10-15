@@ -51,7 +51,7 @@ pyo3 = { version = "0.24", features = ["extension-module", "chrono"], optional =
 pyo3-file = { version = "0.12", optional = true }
 pyo3-log = { version = "0.12.4", optional = true }
 backtrace = { version = "0.3.75", optional = true }
-slog = "2.7.0"
+slog = "2.8.2"
 slog-scope = "4.4.0"
 slog-stdlog = "4.1.1"
 slog-async = "2.8.0"
